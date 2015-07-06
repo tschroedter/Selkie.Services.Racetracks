@@ -1,8 +1,14 @@
 ﻿using System;
+using Castle.Core.Logging;
+using EasyNetQ;
 using JetBrains.Annotations;
+using Selkie.EasyNetQ.Extensions;
 using Selkie.Racetrack;
 using Selkie.Racetrack.Calculators;
+using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor;
+using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
@@ -13,20 +19,40 @@ namespace Selkie.Services.Racetracks
         : IRacetracksSourceManager,
           IDisposable
     {
+        private readonly IBus m_Bus;
+        private readonly IRacetracksToDtoConverter m_Converter;
         private readonly ICalculatorFactory m_Factory;
         private readonly ILinesSourceManager m_LinesSourceManager;
+        private readonly ILogger m_Logger;
+        private readonly object m_Padlock = new object();
         private readonly IRacetrackSettingsSourceManager m_RacetrackSettingsSourceManager;
         private IRacetracksCalculator m_RacetracksCalculator;
 
-        public RacetracksSourceManager([NotNull] ILinesSourceManager linesSourceManager,
+        public RacetracksSourceManager([NotNull] ILogger logger,
+                                       [NotNull] IBus bus,
+                                       [NotNull] ILinesSourceManager linesSourceManager,
                                        [NotNull] IRacetrackSettingsSourceManager racetrackSettingsSourceManager,
-                                       [NotNull] ICalculatorFactory factory)
+                                       [NotNull] ICalculatorFactory factory,
+                                       [NotNull] IRacetracksToDtoConverter converter)
         {
+            m_Logger = logger;
+            m_Bus = bus;
             m_LinesSourceManager = linesSourceManager;
             m_RacetrackSettingsSourceManager = racetrackSettingsSourceManager;
             m_Factory = factory;
+            m_Converter = converter;
 
-            Update();
+            string subscriptionId = GetType().FullName;
+            m_Bus.SubscribeHandlerAsync <RacetrackSettingsChangedMessage>(logger, // todo testing
+                                                                          subscriptionId,
+                                                                          RacetrackSettingsChangedHandler);
+
+            m_Bus.SubscribeHandlerAsync <RacetracksGetMessage>(logger,
+                                                               subscriptionId,
+                                                               RacetracksGetHandler);
+
+
+            m_Bus.PublishAsync(new RacetrackSettingsGetMessage()); // todo testing
         }
 
         public void Dispose()
@@ -46,19 +72,59 @@ namespace Selkie.Services.Racetracks
 
         #endregion
 
-        // todo maybe do on different thread/async here or in CostMatrix
+        internal void RacetrackSettingsChangedHandler(RacetrackSettingsChangedMessage message)
+        {
+            lock ( m_Padlock ) // todo move lock into message subscriber handler code
+            {
+                Update();
+            }
+        }
+
         internal void Update()
         {
             m_Factory.Release(m_RacetracksCalculator);
 
-            IRacetrackSettingsSource settingsSource = m_RacetrackSettingsSourceManager.Source;
+            IRacetrackSettingsSource source = m_RacetrackSettingsSourceManager.Source;
+
+            LogRacetrackSettings(source);
 
             m_RacetracksCalculator = m_Factory.Create <IRacetracksCalculator>();
             m_RacetracksCalculator.Lines = m_LinesSourceManager.Lines;
-            m_RacetracksCalculator.Radius = settingsSource.TurnRadius;
-            m_RacetracksCalculator.IsPortTurnAllowed = settingsSource.IsPortTurnAllowed;
-            m_RacetracksCalculator.IsStarboardTurnAllowed = settingsSource.IsStarboardTurnAllowed;
+            m_RacetracksCalculator.Radius = source.TurnRadius;
+            m_RacetracksCalculator.IsPortTurnAllowed = source.IsPortTurnAllowed;
+            m_RacetracksCalculator.IsStarboardTurnAllowed = source.IsStarboardTurnAllowed;
             m_RacetracksCalculator.Calculate();
+
+            SendRacetracksChangedMessage(Racetracks); // todo testing
+        }
+
+        private void LogRacetrackSettings([NotNull] IRacetrackSettingsSource source)
+        {
+            string text = "[RacetracksSourceManager] " +
+                          "Racetrack Settings: TurnRadius = {0} " +
+                          "IsPortTurnAllowed = {1} " +
+                          "IsStarboardTurnAllowed = {2}";
+
+            m_Logger.Info(text.Inject(source.TurnRadius,
+                                      source.IsPortTurnAllowed,
+                                      source.IsStarboardTurnAllowed));
+        }
+
+        internal void RacetracksGetHandler(RacetracksGetMessage message)
+        {
+            SendRacetracksChangedMessage(Racetracks);
+        }
+
+        internal void SendRacetracksChangedMessage([NotNull] IRacetracks racetracks)
+        {
+            RacetracksDto racetracksDto = m_Converter.ConvertPaths(racetracks);
+
+            var response = new RacetracksChangedMessage
+                           {
+                               Racetracks = racetracksDto
+                           };
+
+            m_Bus.PublishAsync(response);
         }
     }
 }

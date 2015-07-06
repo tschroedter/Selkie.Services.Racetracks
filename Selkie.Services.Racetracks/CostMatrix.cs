@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Castle.Core.Logging;
 using JetBrains.Annotations;
 using Selkie.Geometry.Shapes;
+using Selkie.Racetrack;
 using Selkie.Services.Racetracks.Converters;
 using Selkie.Services.Racetracks.TypedFactories;
 using Selkie.Windsor;
@@ -14,14 +16,20 @@ namespace Selkie.Services.Racetracks
     public sealed class CostMatrix : ICostMatrix
     {
         public static readonly ICostMatrix Unkown = new CostMatrix();
+        public static readonly double CostToMyself = 0.0;
+        private readonly IConverterFactory m_ConverterFactory;
+        private readonly ILinesSourceManager m_LinesSourceManager;
+        private readonly IRacetracksSourceManager m_RacetracksSourceManager;
         private ILine[] m_Lines = new ILine[0];
         private double[][] m_Matrix = new double[0][];
+        private IRacetracks m_Racetracks = Converters.Dtos.Racetracks.Unknown;
 
         private CostMatrix()
         {
         }
 
-        public CostMatrix([NotNull] ILinesSourceManager linesSourceManager,
+        public CostMatrix([NotNull] ILogger logger,
+                          [NotNull] ILinesSourceManager linesSourceManager,
                           [NotNull] IRacetracksSourceManager racetracksSourceManager,
                           [NotNull] IConverterFactory converterFactory)
         {
@@ -30,6 +38,8 @@ namespace Selkie.Services.Racetracks
             m_ConverterFactory = converterFactory;
 
             Initialize();
+
+            logger.Info("Created new CostMatrix!");
         }
 
         public IEnumerable <ILine> Lines
@@ -48,11 +58,20 @@ namespace Selkie.Services.Racetracks
             }
         }
 
+        public IRacetracks Racetracks // todo testing
+        {
+            get
+            {
+                return m_Racetracks;
+            }
+        }
+
         public void Initialize()
         {
             IEnumerable <ILine> sourceLines = m_LinesSourceManager.Lines;
             m_Lines = sourceLines.ToArray();
             m_Matrix = CreateMatrix(m_Lines);
+            m_Racetracks = m_RacetracksSourceManager.Racetracks; // todo testing
         }
 
         [NotNull]
@@ -199,12 +218,5 @@ namespace Selkie.Services.Racetracks
 
             return builder.ToString();
         }
-
-        // ReSharper disable RedundantDefaultFieldInitializer
-        public static readonly double CostToMyself = 0.0;
-        private readonly IConverterFactory m_ConverterFactory;
-        private readonly ILinesSourceManager m_LinesSourceManager;
-        private readonly IRacetracksSourceManager m_RacetracksSourceManager;
-        // ReSharper restore RedundantDefaultFieldInitializer
     }
 }

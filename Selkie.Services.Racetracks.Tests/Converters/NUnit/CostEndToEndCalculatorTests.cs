@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Castle.Core.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using Selkie.Geometry.Primitives;
@@ -16,20 +17,28 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
         [SetUp]
         public void Setup()
         {
-            var path = Substitute.For <IPath>();
-            path.Distance.Returns(new Distance(100.0));
+            var pathOne = Substitute.For <IPath>();
+            pathOne.Distance.Returns(new Distance(100.0));
+            var pathTwo = Substitute.For <IPath>();
+            pathTwo.Distance.Returns(new Distance(200.0));
+
             m_Paths = new[]
                       {
                           new[]
                           {
-                              null,
-                              path
+                              pathOne,
+                              pathTwo
+                          },
+                          new[]
+                          {
+                              pathOne,
+                              pathTwo
                           }
                       };
 
             m_Racetracks = Substitute.For <IRacetracks>();
 
-            m_Calculator = new CostEndToEndCalculator
+            m_Calculator = new CostEndToEndCalculator(Substitute.For <ILogger>())
                            {
                                Racetracks = m_Racetracks
                            };
@@ -44,7 +53,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
         {
             m_Racetracks.ForwardToReverse.Returns(m_Paths);
 
-            const double expected = 100.0;
+            const double expected = 200.0;
             double actual = m_Calculator.CalculateRacetrackCost(0,
                                                                 1);
 

@@ -57,6 +57,21 @@ Scenario: CostMatrix is calculated
 	When I send a CostMatrixCalculateMessage
 	Then the CostMatrixChangedMessage contains the racetracks
 
+Scenario: RacetracksGetMessage set and changed
+	Given Service is running
+	And Did not receive RacetrackSettingsChangedMessage
+	And Did not receive LinesChangedMessage
+	And Did not receive CostMatrixChangedMessage
+	When I send a RacetrackSettingsSetMessage
+	Then the result should be that I received a RacetrackSettingsChangedMessage
+	When I send a LinesSetMessage
+	Then the result should be that I received a LinesChangedMessage
+	When I send a CostMatrixCalculateMessage
+	Then the CostMatrixChangedMessage contains the racetracks
+	Given Did not receive RacetracksChangedMessage
+	When I send a RacetracksGetMessage
+	Then the result should be that I received a RacetracksChangedMessage
+
 #	And Did not receive CostMatrixChangedMessage
 #	When I send a RacetrackSettingsSetMessage
 #	When I send a LinesSetMessage

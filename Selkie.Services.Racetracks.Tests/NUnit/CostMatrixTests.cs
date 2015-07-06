@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Castle.Core.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using Selkie.Geometry.Shapes;
@@ -526,7 +527,8 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
 
             m_RacetracksSourceManager = Substitute.For <IRacetracksSourceManager>();
 
-            m_CostMatrix = new CostMatrix(m_LinesSourceManager,
+            m_CostMatrix = new CostMatrix(Substitute.For <ILogger>(),
+                                          m_LinesSourceManager,
                                           m_RacetracksSourceManager,
                                           m_ConverterFactory);
         }

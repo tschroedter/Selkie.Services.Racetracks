@@ -26,9 +26,15 @@ namespace Selkie.Services.Racetracks
             m_Logger = logger;
             m_Bus = bus;
 
+            string subscriptionId = GetType().ToString();
+
             bus.SubscribeHandlerAsync <RacetrackSettingsSetMessage>(logger,
-                                                                    GetType().ToString(),
-                                                                    RacetrackSettingsSetMessageHandler);
+                                                                    subscriptionId,
+                                                                    RacetrackSettingsSetHandler);
+
+            bus.SubscribeHandlerAsync <RacetrackSettingsGetMessage>(logger,
+                                                                    subscriptionId,
+                                                                    RacetrackSettingsGetHandler);
         }
 
         public IRacetrackSettingsSource Source
@@ -49,7 +55,12 @@ namespace Selkie.Services.Racetracks
             m_Logger.Info("Stopped '{0}'!".Inject(GetType().FullName));
         }
 
-        internal void RacetrackSettingsSetMessageHandler([NotNull] RacetrackSettingsSetMessage message)
+        internal void RacetrackSettingsGetHandler(RacetrackSettingsGetMessage obj)
+        {
+            SendRacetrackSettingsChangedMessage(m_Source);
+        }
+
+        internal void RacetrackSettingsSetHandler([NotNull] RacetrackSettingsSetMessage message)
         {
             double turnRadiusInMetres = message.TurnRadiusInMetres;
 
@@ -72,12 +83,31 @@ namespace Selkie.Services.Racetracks
                                                    message.IsPortTurnAllowed,
                                                    message.IsStarboardTurnAllowed);
 
+            LogRacetrackSettings(m_Source);
+
+            SendRacetrackSettingsChangedMessage(m_Source);
+        }
+
+        internal void SendRacetrackSettingsChangedMessage([NotNull] IRacetrackSettingsSource source)
+        {
             m_Bus.PublishAsync(new RacetrackSettingsChangedMessage
                                {
-                                   TurnRadiusInMetres = m_Source.TurnRadius.Length,
-                                   IsPortTurnAllowed = m_Source.IsPortTurnAllowed,
-                                   IsStarboardTurnAllowed = m_Source.IsStarboardTurnAllowed
+                                   TurnRadiusInMetres = source.TurnRadius.Length,
+                                   IsPortTurnAllowed = source.IsPortTurnAllowed,
+                                   IsStarboardTurnAllowed = source.IsStarboardTurnAllowed
                                });
+        }
+
+        private void LogRacetrackSettings([NotNull] IRacetrackSettingsSource source)
+        {
+            string text = "[RacetrackSettingsSourceManager] " +
+                          "Racetrack Settings: TurnRadius = {0} " +
+                          "IsPortTurnAllowed = {1} " +
+                          "IsStarboardTurnAllowed = {2}";
+
+            m_Logger.Info(text.Inject(source.TurnRadius,
+                                      source.IsPortTurnAllowed,
+                                      source.IsStarboardTurnAllowed));
         }
     }
 }

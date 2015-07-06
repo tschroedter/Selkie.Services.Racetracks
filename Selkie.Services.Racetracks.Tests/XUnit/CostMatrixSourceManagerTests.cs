@@ -14,18 +14,18 @@ using Xunit.Extensions;
 
 namespace Selkie.Services.Racetracks.Tests.XUnit
 {
-    //ncrunch: no coverage start
+    //ncrunch: no coverRacetracksGetMessageage start
     [ExcludeFromCodeCoverage]
     public sealed class CostMatrixSourceManagerTests
     {
         [Theory]
         [AutoNSubstituteData]
         public void SubscribesToCostMatrixGetMessage([NotNull] [Frozen] IBus bus,
-                                                     [NotNull] CostMatrixSourceManager manager)
+                                                     [NotNull] CostMatrixSourceManager sut)
         {
             // assemble
             // act
-            string subscriptionId = manager.GetType().FullName;
+            string subscriptionId = sut.GetType().FullName;
 
             // assert
             bus.Received().SubscribeAsync(subscriptionId,
@@ -34,17 +34,45 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
         [Theory]
         [AutoNSubstituteData]
+        public void SubscribesToRacetracksChangedMessage([NotNull] [Frozen] IBus bus,
+                                                         [NotNull] CostMatrixSourceManager sut)
+        {
+            // assemble
+            // act
+            string subscriptionId = sut.GetType().FullName;
+
+            // assert
+            bus.Received().SubscribeAsync(subscriptionId,
+                                          Arg.Any <Func <RacetracksChangedMessage, Task>>());
+        }
+
+        [Theory]
+        [AutoNSubstituteData]
+        public void ConstructorSendsRacetrackSettingsGetMessage([NotNull] [Frozen] IBus bus,
+                                                                [NotNull] CostMatrixSourceManager sut)
+        {
+            // assemble
+            // act
+            sut.UpdateSource();
+
+            // assert
+            bus.Received().PublishAsync(Arg.Any <RacetrackSettingsGetMessage>());
+        }
+
+        [Theory]
+        [AutoNSubstituteData]
         public void SourceDefault([NotNull] [Frozen] IBus bus,
-                                  [NotNull] CostMatrixSourceManager manager)
+                                  [NotNull] CostMatrixSourceManager sut)
         {
             Assert.Equal(CostMatrix.Unkown,
-                         manager.Source);
+                         sut.Source);
         }
 
         [Theory]
         [AutoNSubstituteData]
         public void UpdateSourceSetsSource([NotNull] IBus bus,
                                            [NotNull] ILogger logger,
+                                           [NotNull] IRacetracksToDtoConverter converter,
                                            [NotNull] ICostMatrix costMatrix)
         {
             // assemble
@@ -66,21 +94,31 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
         [Theory]
         [AutoNSubstituteData]
-        public void UpdateSourceSendsCostMatrixChangedMessage([NotNull] [Frozen] IBus bus,
-                                                              [NotNull] CostMatrixSourceManager manager)
+        public void UpdateSourceSendsCostMatrixChangedMessage([NotNull] IBus bus,
+                                                              [NotNull] ILogger logger,
+                                                              [NotNull] ICostMatrix costMatrix)
         {
             // assemble
+            var factory = Substitute.For <ICostMatrixFactory>();
+            factory.Create().Returns(costMatrix);
+
+            CostMatrixSourceManager sut = ConfigureManagerWithtMatrix(bus,
+                                                                      logger,
+                                                                      costMatrix);
+
+
             // act
-            manager.UpdateSource();
+            sut.UpdateSource();
 
             // assert
-            bus.Received().PublishAsync(Arg.Any <CostMatrixChangedMessage>());
+            bus.Received().PublishAsync(Arg.Is <CostMatrixChangedMessage>(x => x.Matrix == costMatrix.Matrix));
         }
 
         [Theory]
         [AutoNSubstituteData]
         public void UpdateSourceReleasesOldSource([NotNull] IBus bus,
-                                                  [NotNull] ILogger logger)
+                                                  [NotNull] ILogger logger,
+                                                  [NotNull] IRacetracksToDtoConverter converter)
         {
             // assemble
             var factory = Substitute.For <ICostMatrixFactory>();
@@ -106,13 +144,28 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
         [Theory]
         [AutoNSubstituteData]
         public void CostMatrixCalculateHandlerCallsUpdateSource([NotNull] [Frozen] IBus bus,
-                                                                [NotNull] CostMatrixSourceManager manager)
+                                                                [NotNull] CostMatrixSourceManager sut)
         {
             // assemble
             var message = new CostMatrixCalculateMessage();
 
             // act
-            manager.CostMatrixCalculateHandler(message);
+            sut.CostMatrixCalculateHandler(message);
+
+            // assert
+            bus.Received().PublishAsync(Arg.Any <CostMatrixChangedMessage>());
+        }
+
+        [Theory]
+        [AutoNSubstituteData]
+        public void RacetracksChangedHandlerCallsUpdateSource([NotNull] [Frozen] IBus bus,
+                                                              [NotNull] CostMatrixSourceManager sut)
+        {
+            // assemble
+            var message = new RacetracksChangedMessage();
+
+            // act
+            sut.RacetracksChangedHandler(message);
 
             // assert
             bus.Received().PublishAsync(Arg.Any <CostMatrixChangedMessage>());
@@ -122,24 +175,25 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
         [AutoNSubstituteData]
         public void CostMatrixGetHandlerSendMessage([NotNull] IBus bus,
                                                     [NotNull] ILogger logger,
+                                                    [NotNull] IRacetracksToDtoConverter converter,
                                                     [NotNull] ICostMatrix costMatrix)
         {
             // assemble
-            CostMatrixSourceManager manager = ConfigureManagerWIthtMatrix(bus,
-                                                                          logger,
-                                                                          costMatrix);
+            CostMatrixSourceManager sut = ConfigureManagerWithtMatrix(bus,
+                                                                      logger,
+                                                                      costMatrix);
 
             bus.ClearReceivedCalls();
 
             // act
-            manager.CostMatrixGetHandler(new CostMatrixGetMessage());
+            sut.CostMatrixGetHandler(new CostMatrixGetMessage());
 
             // assert
             bus.Received().PublishAsync(Arg.Is <CostMatrixChangedMessage>(x => x.Matrix == costMatrix.Matrix));
         }
 
         [NotNull]
-        private static CostMatrixSourceManager ConfigureManagerWIthtMatrix([NotNull] IBus bus,
+        private static CostMatrixSourceManager ConfigureManagerWithtMatrix([NotNull] IBus bus,
                                                                            [NotNull] ILogger logger,
                                                                            [NotNull] ICostMatrix costMatrix)
         {
@@ -165,11 +219,11 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
         [Theory]
         [AutoNSubstituteData]
         public void StartCallsLoggerTest([NotNull] [Frozen] ILogger logger,
-                                         [NotNull] CostMatrixSourceManager manager)
+                                         [NotNull] CostMatrixSourceManager sut)
         {
             // assemble
             // act
-            manager.Start();
+            sut.Start();
 
             // assert
             logger.Received().Info(Arg.Is <string>(x => x.StartsWith("Started")));
@@ -178,11 +232,11 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
         [Theory]
         [AutoNSubstituteData]
         public void StopCallsLoggerTest([NotNull] [Frozen] ILogger logger,
-                                        [NotNull] CostMatrixSourceManager manager)
+                                        [NotNull] CostMatrixSourceManager sut)
         {
             // assemble
             // act
-            manager.Stop();
+            sut.Stop();
 
             // assert
             logger.Received().Info(Arg.Is <string>(x => x.StartsWith("Stopped")));

@@ -36,7 +36,17 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void RacetrackSettingsSetMessageHandlerCreatesNewSourceTest()
+        public void RacetrackSettingsGetHandlerSendsMessageTest()
+        {
+            var message = new RacetrackSettingsGetMessage();
+
+            m_Manager.RacetrackSettingsGetHandler(message);
+
+            m_Bus.Received().PublishAsync(Arg.Any <RacetrackSettingsChangedMessage>());
+        }
+
+        [Test]
+        public void RacetrackSettingsSetHandlerCreatesNewSourceTest()
         {
             var turnRadius = new Distance(100.0);
             var message = new RacetrackSettingsSetMessage
@@ -46,7 +56,7 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
                               IsStarboardTurnAllowed = true
                           };
 
-            m_Manager.RacetrackSettingsSetMessageHandler(message);
+            m_Manager.RacetrackSettingsSetHandler(message);
 
             IRacetrackSettingsSource actual = m_Manager.Source;
 
@@ -55,7 +65,7 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void RacetrackSettingsSetMessageHandlerSendsMessageTest()
+        public void RacetrackSettingsSetHandlerSendsMessageTest()
         {
             var message = new RacetrackSettingsSetMessage
                           {
@@ -64,13 +74,13 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
                               IsStarboardTurnAllowed = true
                           };
 
-            m_Manager.RacetrackSettingsSetMessageHandler(message);
+            m_Manager.RacetrackSettingsSetHandler(message);
 
             m_Bus.Received().PublishAsync(Arg.Any <RacetrackSettingsChangedMessage>());
         }
 
         [Test]
-        public void RacetrackSettingsSetMessageHandlerThrowsForTurnRadiusInMetresIsNegativeTest()
+        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusInMetresIsNegativeTest()
         {
             var turnRadius = new Distance(-1.0);
             var message = new RacetrackSettingsSetMessage
@@ -80,11 +90,11 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
                               IsStarboardTurnAllowed = true
                           };
 
-            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetMessageHandler(message));
+            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetHandler(message));
         }
 
         [Test]
-        public void RacetrackSettingsSetMessageHandlerThrowsForTurnRadiusInMetresIsZeroTest()
+        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusInMetresIsZeroTest()
         {
             var turnRadius = new Distance(0.0);
             var message = new RacetrackSettingsSetMessage
@@ -94,7 +104,26 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
                               IsStarboardTurnAllowed = true
                           };
 
-            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetMessageHandler(message));
+            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetHandler(message));
+        }
+
+        [Test]
+        public void SendRacetrackSettingsChangedMessageSendsMessageTest()
+        {
+            var source = Substitute.For <IRacetrackSettingsSource>();
+            source.TurnRadius.Returns(new Distance(1.0));
+            source.IsPortTurnAllowed.Returns(true);
+            source.IsStarboardTurnAllowed.Returns(true);
+
+            m_Manager.SendRacetrackSettingsChangedMessage(source);
+
+            m_Bus.Received()
+                 .PublishAsync(
+                               Arg.Is <RacetrackSettingsChangedMessage>(
+                                                                        x =>
+                                                                        Math.Abs(x.TurnRadiusInMetres - 1.0) < 0.1 &&
+                                                                        x.IsPortTurnAllowed &&
+                                                                        x.IsStarboardTurnAllowed));
         }
 
         [Test]
@@ -114,7 +143,14 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void SubscribesToPRacetrackSettingsSetMessageTest()
+        public void SubscribesToRacetrackSettingsGetMessageTest()
+        {
+            m_Bus.Received().SubscribeAsync(m_Manager.GetType().ToString(),
+                                            Arg.Any <Func <RacetrackSettingsGetMessage, Task>>());
+        }
+
+        [Test]
+        public void SubscribesToRacetrackSettingsSetMessageTest()
         {
             m_Bus.Received().SubscribeAsync(m_Manager.GetType().ToString(),
                                             Arg.Any <Func <RacetrackSettingsSetMessage, Task>>());

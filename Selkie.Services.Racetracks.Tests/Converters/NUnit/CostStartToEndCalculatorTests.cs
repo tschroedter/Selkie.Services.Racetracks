@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Castle.Core.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using Selkie.Geometry.Primitives;
@@ -29,7 +30,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
 
             m_Racetracks = Substitute.For <IRacetracks>();
 
-            m_Calculator = new CostStartToEndCalculator
+            m_Calculator = new CostStartToEndCalculator(Substitute.For <ILogger>())
                            {
                                Racetracks = m_Racetracks
                            };

@@ -1,3 +1,5 @@
+using Castle.Core.Logging;
+using JetBrains.Annotations;
 using Selkie.Racetrack;
 
 namespace Selkie.Services.Racetracks.Converters
@@ -6,6 +8,11 @@ namespace Selkie.Services.Racetracks.Converters
         : BaseCostCalculator,
           ICostEndToEndCalculator
     {
+        public CostEndToEndCalculator([NotNull] ILogger logger)
+            : base(logger)
+        {
+        }
+
         internal override double CalculateRacetrackCost(int fromLineId,
                                                         int toLineId)
         {

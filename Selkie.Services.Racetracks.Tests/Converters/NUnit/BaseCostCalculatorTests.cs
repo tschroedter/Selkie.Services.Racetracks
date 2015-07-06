@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using Castle.Core.Logging;
 using JetBrains.Annotations;
 using NSubstitute;
 using NUnit.Framework;
@@ -44,7 +45,9 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
 
             CreateRacetracks();
 
-            m_Calculator = new TestBaseCostCalculator();
+            m_Logger = Substitute.For <ILogger>();
+
+            m_Calculator = new TestBaseCostCalculator(m_Logger);
         }
 
         private TestBaseCostCalculator m_Calculator;
@@ -56,6 +59,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
         private IRacetracks m_Racetracks;
         private IPath[][] m_ReverseForwardPaths;
         private IPath[][] m_ReverseReversePaths;
+        private ILogger m_Logger;
 
         private void CreateRacetracks()
         {
@@ -152,11 +156,71 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
 
         private class TestBaseCostCalculator : BaseCostCalculator
         {
+            public TestBaseCostCalculator([NotNull] ILogger logger)
+                : base(logger)
+            {
+            }
+
             internal override double CalculateRacetrackCost(int fromLineId,
                                                             int toLineId)
             {
                 return 100.0;
             }
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldThrowForFromLineIdToBigIdTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
+
+            m_Calculator.CheckAndCalculate(2,
+                                           1);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldThrowForNegativeFromLineIdTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
+
+            m_Calculator.CheckAndCalculate(-1,
+                                           1);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldThrowForNegativeToLineIdTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
+
+            m_Calculator.CheckAndCalculate(0,
+                                           -1);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldThrowForPathIsEmptyTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(new IPath[0][]);
+
+            m_Calculator.CheckAndCalculate(0,
+                                           2);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldThrowForToLineIdToBigIdTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
+
+            m_Calculator.CheckAndCalculate(0,
+                                           2);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
         }
 
         [Test]
@@ -204,7 +268,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
         [Test]
         public void DefaultRacetracksest()
         {
-            Assert.True(m_Calculator.Racetracks is Racetracks.Converters.Racetracks);
+            Assert.True(m_Calculator.Racetracks is Racetracks.Converters.Dtos.Racetracks);
         }
 
         [Test]

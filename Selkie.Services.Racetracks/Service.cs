@@ -1,6 +1,7 @@
 ﻿using Castle.Core.Logging;
 using EasyNetQ;
 using JetBrains.Annotations;
+using Selkie.EasyNetQ;
 using Selkie.Services.Common;
 using Selkie.Services.Common.Messages;
 using Selkie.Windsor;

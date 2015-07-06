@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Castle.Core.Logging;
 using JetBrains.Annotations;
 using NSubstitute;
 using NUnit.Framework;
@@ -22,10 +23,12 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
             ComfigureLines();
             ConfigureRacetracks();
 
-            m_Converter = new LineToLinesConverter(new CostStartToStartCalculator(),
-                                                   new CostStartToEndCalculator(),
-                                                   new CostEndToStartCalculator(),
-                                                   new CostEndToEndCalculator())
+            m_Logger = Substitute.For <ILogger>();
+
+            m_Converter = new LineToLinesConverter(new CostStartToStartCalculator(m_Logger),
+                                                   new CostStartToEndCalculator(m_Logger),
+                                                   new CostEndToStartCalculator(m_Logger),
+                                                   new CostEndToEndCalculator(m_Logger))
                           {
                               Racetracks = m_Racetracks,
                               Line = m_Line1,
@@ -45,6 +48,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
         private IRacetracks m_Racetracks;
         private IPath[][] m_ReverseForwardPaths;
         private IPath[][] m_ReverseReversePaths;
+        private ILogger m_Logger;
 
         private void ComfigureLines()
         {
@@ -431,12 +435,12 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
         [Test]
         public void RacetracksDefaultTest()
         {
-            var converter = new LineToLinesConverter(new CostStartToStartCalculator(),
-                                                     new CostStartToEndCalculator(),
-                                                     new CostEndToStartCalculator(),
-                                                     new CostEndToEndCalculator());
+            var converter = new LineToLinesConverter(new CostStartToStartCalculator(m_Logger),
+                                                     new CostStartToEndCalculator(m_Logger),
+                                                     new CostEndToStartCalculator(m_Logger),
+                                                     new CostEndToEndCalculator(m_Logger));
 
-            Assert.True(Racetracks.Converters.Racetracks.Unknown == converter.Racetracks);
+            Assert.True(Racetracks.Converters.Dtos.Racetracks.Unknown == converter.Racetracks);
         }
     }
 }

@@ -10,10 +10,12 @@ namespace Selkie.Services.Racetracks
 {
     public class Installer : BaseInstaller <Installer>
     {
-        // ReSharper disable once CodeAnnotationAnalyzer
         protected override void InstallComponents(IWindsorContainer container,
                                                   IConfigurationStore store)
         {
+            base.InstallComponents(container,
+                                   store);
+
             // ReSharper disable MaximumChainedReferences
             container.Register(
                                Classes.FromThisAssembly()

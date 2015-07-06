@@ -11,7 +11,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.XUnit
         [Fact]
         public void IsUnknownTest()
         {
-            bool actual = Racetracks.Converters.Racetracks.Unknown.IsUnknown;
+            bool actual = Racetracks.Converters.Dtos.Racetracks.Unknown.IsUnknown;
 
             Assert.True(actual);
         }
@@ -19,7 +19,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.XUnit
         [Fact]
         public void ForwardToForwardDefaultTest()
         {
-            IPath[][] actual = Racetracks.Converters.Racetracks.Unknown.ForwardToForward;
+            IPath[][] actual = Racetracks.Converters.Dtos.Racetracks.Unknown.ForwardToForward;
 
             Assert.Equal(0,
                          actual.GetLength(0));
@@ -28,7 +28,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.XUnit
         [Fact]
         public void ForwardToReverseDefaultTest()
         {
-            IPath[][] actual = Racetracks.Converters.Racetracks.Unknown.ForwardToReverse;
+            IPath[][] actual = Racetracks.Converters.Dtos.Racetracks.Unknown.ForwardToReverse;
 
             Assert.Equal(0,
                          actual.GetLength(0));
@@ -37,7 +37,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.XUnit
         [Fact]
         public void ReverseToForwardDefaultTest()
         {
-            IPath[][] actual = Racetracks.Converters.Racetracks.Unknown.ReverseToForward;
+            IPath[][] actual = Racetracks.Converters.Dtos.Racetracks.Unknown.ReverseToForward;
 
             Assert.Equal(0,
                          actual.GetLength(0));
@@ -46,7 +46,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.XUnit
         [Fact]
         public void ReverseToReverseDefaultTest()
         {
-            IPath[][] actual = Racetracks.Converters.Racetracks.Unknown.ReverseToReverse;
+            IPath[][] actual = Racetracks.Converters.Dtos.Racetracks.Unknown.ReverseToReverse;
 
             Assert.Equal(0,
                          actual.GetLength(0));

@@ -24,8 +24,10 @@ namespace Selkie.Services.Racetracks.Console.Client
         private readonly ISelkieConsole m_SelkieConsole;
         private bool m_IsReceivedCostMatrixChangedMessage;
         private bool m_IsReceivedLinesChangedMessage;
+        private bool m_IsReceivedRacetracksChangedMessage;
         private bool m_IsReceivedRacetrackSettingsChangedMessage;
         private double[][] m_Matrix;
+        private RacetracksDto m_Racetracks;
 
         public CallService([NotNull] IBus bus,
                            [NotNull] ILogger logger,
@@ -46,6 +48,16 @@ namespace Selkie.Services.Racetracks.Console.Client
             m_Bus.SubscribeHandlerAsync <CostMatrixChangedMessage>(logger1,
                                                                    GetType().FullName,
                                                                    CostMatrixChangedHandler);
+
+            m_Bus.SubscribeHandlerAsync <RacetracksChangedMessage>(logger1,
+                                                                   GetType().FullName,
+                                                                   RacetracksChangedHandler);
+        }
+
+        private void RacetracksChangedHandler(RacetracksChangedMessage message)
+        {
+            m_IsReceivedRacetracksChangedMessage = true;
+            m_Racetracks = message.Racetracks;
         }
 
         private void LinesChangedHandler([NotNull] LinesChangedMessage message)
@@ -66,11 +78,15 @@ namespace Selkie.Services.Racetracks.Console.Client
 
         public void Do()
         {
+            SendLinesSetMessage();
+            WaitForLinesChangedMessage();
             SendRacetrackSettingsSetMessage();
             WaitForRacetrackSettingsChangedMessage();
-            SendLinesSetMessage();
+            WaitForRacetracksChangedMessage();
             SendCostMatrixCalculateMessage();
             WaitForCostMatrixChangedMessage();
+            SendRacetracksGetMessage();
+            WaitForRacetracksChangedMessage();
         }
 
         public void SendRacetrackSettingsSetMessage()
@@ -149,6 +165,37 @@ namespace Selkie.Services.Racetracks.Console.Client
                                                                                                                m_Matrix
                                                                                                                    .GetLength
                                                                                                                    (0)));
+            m_SelkieConsole.WriteLine(CostMatrixToString(m_Matrix));
+        }
+
+        public void SendRacetracksGetMessage()
+        {
+            m_SelkieConsole.WriteLine("Sending RacetracksGetMessage!");
+
+            m_Bus.PublishAsync(new RacetracksGetMessage());
+        }
+
+        public void WaitForRacetracksChangedMessage()
+        {
+            SleepWaitAndDo(() => m_IsReceivedRacetracksChangedMessage,
+                           DoNothing);
+
+            if ( !m_IsReceivedCostMatrixChangedMessage )
+            {
+                throw new Exception("Did not receive RacetracksChangedMessage!");
+            }
+
+            if ( m_Racetracks == null )
+            {
+                throw new Exception("Did not receive Racetracks!");
+            }
+
+            m_SelkieConsole.WriteLine(
+                                      "Received RacetracksChangedMessage! - ForwardToForward: {0} ForwardToReverse: {1} ReverseToForward: {2} ReverseToReverse: {3}"
+                                          .Inject(m_Racetracks.ForwardToForward.Length,
+                                                  m_Racetracks.ForwardToReverse.Length,
+                                                  m_Racetracks.ReverseToForward.Length,
+                                                  m_Racetracks.ReverseToReverse.Length));
             m_SelkieConsole.WriteLine(CostMatrixToString(m_Matrix));
         }
 

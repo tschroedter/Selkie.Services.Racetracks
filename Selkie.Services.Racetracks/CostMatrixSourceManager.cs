@@ -18,7 +18,7 @@ namespace Selkie.Services.Racetracks
         private readonly IBus m_Bus;
         private readonly ICostMatrixFactory m_Factory;
         private readonly ILogger m_Logger;
-        private readonly object m_PadlockSource = new object();
+        private readonly object m_Padlock = new object();
         private ICostMatrix m_Source = CostMatrix.Unkown;
 
         public CostMatrixSourceManager([NotNull] IBus bus,
@@ -29,13 +29,21 @@ namespace Selkie.Services.Racetracks
             m_Logger = logger;
             m_Factory = factory;
 
+            string subscriptionId = GetType().FullName;
+
             m_Bus.SubscribeHandlerAsync <CostMatrixCalculateMessage>(logger,
-                                                                     GetType().FullName,
+                                                                     subscriptionId,
                                                                      CostMatrixCalculateHandler);
 
             m_Bus.SubscribeHandlerAsync <CostMatrixGetMessage>(logger,
-                                                               GetType().FullName,
+                                                               subscriptionId,
                                                                CostMatrixGetHandler);
+
+            m_Bus.SubscribeHandlerAsync <RacetracksChangedMessage>(logger,
+                                                                   subscriptionId,
+                                                                   RacetracksChangedHandler);
+
+            m_Bus.PublishAsync(new RacetrackSettingsGetMessage());
         }
 
         public ICostMatrix Source
@@ -44,7 +52,7 @@ namespace Selkie.Services.Racetracks
             {
                 ICostMatrix source;
 
-                lock ( m_PadlockSource )
+                lock ( m_Padlock )
                 {
                     source = m_Source;
                 }
@@ -68,36 +76,42 @@ namespace Selkie.Services.Racetracks
             UpdateSource();
         }
 
+        internal void RacetracksChangedHandler(RacetracksChangedMessage message)
+        {
+            UpdateSource();
+        }
+
         internal void UpdateSource()
         {
-            lock ( this ) // todo warning nested locks
+            lock ( m_Padlock )
             {
                 ICostMatrix costMatrix = m_Factory.Create();
+                ICostMatrix oldSource = m_Source;
 
-                lock ( m_PadlockSource )
+                m_Source = costMatrix;
+
+                if ( oldSource != null )
                 {
-                    ICostMatrix oldSource = m_Source;
-
-                    m_Source = costMatrix;
-
-                    if ( oldSource != null )
-                    {
-                        m_Factory.Release(oldSource);
-                    }
+                    m_Factory.Release(oldSource);
                 }
 
-                m_Bus.PublishAsync(new CostMatrixChangedMessage
-                                   {
-                                       Matrix = costMatrix.Matrix
-                                   });
+                SendCostMatrixChangedMessage(costMatrix);
             }
+        }
+
+        private void SendCostMatrixChangedMessage(ICostMatrix costMatrix)
+        {
+            m_Bus.PublishAsync(new CostMatrixChangedMessage
+                               {
+                                   Matrix = costMatrix.Matrix
+                               });
         }
 
         internal void CostMatrixGetHandler([NotNull] CostMatrixGetMessage message)
         {
             ICostMatrix costMatrix;
 
-            lock ( m_PadlockSource )
+            lock ( m_Padlock )
             {
                 costMatrix = m_Source;
             }
