@@ -8,7 +8,7 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps
         [Given(@"Did not receive RacetracksChangedMessage")]
         public override void Do()
         {
-            ScenarioContext.Current["IsReceivedRacetracksChangedMessage"] = false;
+            ScenarioContext.Current [ "IsReceivedRacetracksChangedMessage" ] = false;
         }
     }
 }

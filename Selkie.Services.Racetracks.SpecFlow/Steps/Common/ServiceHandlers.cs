@@ -1,7 +1,5 @@
-﻿using Castle.Core.Logging;
-using EasyNetQ;
-using JetBrains.Annotations;
-using Selkie.EasyNetQ.Extensions;
+﻿using JetBrains.Annotations;
+using Selkie.EasyNetQ;
 using Selkie.Services.Common.Messages;
 using TechTalk.SpecFlow;
 
@@ -9,28 +7,23 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
 {
     public partial class ServiceHandlers
     {
-        private readonly IBus m_Bus;
-        private readonly ILogger m_Logger;
+        private readonly ISelkieBus m_Bus;
 
         public ServiceHandlers()
         {
-            m_Logger = ( ILogger ) ScenarioContext.Current [ "ILogger" ];
-            m_Bus = ( IBus ) ScenarioContext.Current [ "IBus" ];
+            m_Bus = ( ISelkieBus ) ScenarioContext.Current [ "ISelkieBus" ];
         }
 
         public void Subscribe()
         {
-            m_Bus.SubscribeHandlerAsync <PingResponseMessage>(m_Logger,
-                                                              GetType().FullName,
-                                                              PingResponseHandler);
+            m_Bus.SubscribeAsync <PingResponseMessage>(GetType().FullName,
+                                                       PingResponseHandler);
 
-            m_Bus.SubscribeHandlerAsync <ServiceStartedResponseMessage>(m_Logger,
-                                                                        GetType().FullName,
-                                                                        ServiceStartedResponseHandler);
+            m_Bus.SubscribeAsync <ServiceStartedResponseMessage>(GetType().FullName,
+                                                                 ServiceStartedResponseHandler);
 
-            m_Bus.SubscribeHandlerAsync <ServiceStoppedResponseMessage>(m_Logger,
-                                                                        GetType().FullName,
-                                                                        ServiceStoppedResponseHandler);
+            m_Bus.SubscribeAsync <ServiceStoppedResponseMessage>(GetType().FullName,
+                                                                 ServiceStoppedResponseHandler);
 
             SubscribeOther();
         }

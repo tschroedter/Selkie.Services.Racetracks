@@ -1,7 +1,6 @@
 using System;
-using System.Threading;
-using EasyNetQ;
 using JetBrains.Annotations;
+using Selkie.EasyNetQ;
 using TechTalk.SpecFlow;
 
 namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
@@ -9,15 +8,14 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
     [Binding]
     public abstract class BaseStep
     {
-        private static readonly TimeSpan SleepTime = TimeSpan.FromSeconds(1.0);
-        private readonly IBus m_Bus;
+        private readonly ISelkieBus m_Bus;
 
         protected BaseStep()
         {
-            m_Bus = ( IBus ) ScenarioContext.Current [ "IBus" ];
+            m_Bus = ( ISelkieBus ) ScenarioContext.Current [ "ISelkieBus" ];
         }
 
-        protected IBus Bus
+        protected ISelkieBus Bus
         {
             get
             {
@@ -28,17 +26,8 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
         public void SleepWaitAndDo([NotNull] Func <bool> breakIfTrue,
                                    [NotNull] Action doSomething)
         {
-            for ( var i = 0 ; i < 10 ; i++ )
-            {
-                Thread.Sleep(SleepTime);
-
-                if ( breakIfTrue() )
-                {
-                    break;
-                }
-
-                doSomething();
-            }
+            Helper.SleepWaitAndDo(breakIfTrue,
+                                  doSomething);
         }
 
         public void DoNothing()

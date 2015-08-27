@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Castle.Core.Logging;
 using JetBrains.Annotations;
 using Selkie.Geometry.Shapes;
 using Selkie.Racetrack;
+using Selkie.Windsor;
 using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks.Converters
@@ -10,7 +10,7 @@ namespace Selkie.Services.Racetracks.Converters
     // todo use Fody!!!!
     public abstract class BaseCostCalculator : IBaseCostCalculator
     {
-        private readonly ILogger m_Logger;
+        private readonly ISelkieLogger m_Logger;
         private readonly object m_Padlock = new object();
         private Dictionary <int, double> m_Costs = new Dictionary <int, double>();
         private ILine m_Line = Geometry.Shapes.Line.Unknown;
@@ -21,7 +21,7 @@ namespace Selkie.Services.Racetracks.Converters
 
         private IRacetracks m_Racetracks = Dtos.Racetracks.Unknown;
 
-        protected BaseCostCalculator([NotNull] ILogger logger)
+        protected BaseCostCalculator([NotNull] ISelkieLogger logger)
         {
             m_Logger = logger;
         }
@@ -128,7 +128,7 @@ namespace Selkie.Services.Racetracks.Converters
                                           toLineId);
         }
 
-        private bool IsValidLineId(int lineId) // todo testing
+        private bool IsValidLineId(int lineId)
         {
             int length = m_Racetracks.ForwardToForward.Length;
 

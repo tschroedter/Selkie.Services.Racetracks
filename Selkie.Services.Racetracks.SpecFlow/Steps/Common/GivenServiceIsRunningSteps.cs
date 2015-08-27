@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading;
-using Castle.Core.Logging;
 using Castle.Windsor;
 using Castle.Windsor.Installer;
-using EasyNetQ;
-using JetBrains.Annotations;
 using NUnit.Framework;
+using Selkie.EasyNetQ;
 using Selkie.Services.Common.Messages;
+using Selkie.Windsor;
 using TechTalk.SpecFlow;
 
 namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
@@ -16,7 +14,6 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
     [ExcludeFromCodeCoverage]
     public sealed class GivenServiceIsRunningStep : IDisposable
     {
-        private static readonly TimeSpan SleepTime = TimeSpan.FromSeconds(1.0);
         private IWindsorContainer m_Container;
         private ServiceHandlers m_ServiceHandlers;
         private SpecFlowService m_SpecFlowService;
@@ -33,8 +30,8 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
             m_Container = new WindsorContainer();
             m_Container.Install(FromAssembly.This());
 
-            ScenarioContext.Current [ "ILogger" ] = m_Container.Resolve <ILogger>();
-            ScenarioContext.Current [ "IBus" ] = m_Container.Resolve <IBus>(); // todo create ISelkieBus
+            ScenarioContext.Current [ "ISelkieLogger" ] = m_Container.Resolve <ISelkieLogger>();
+            ScenarioContext.Current [ "ISelkieBus" ] = m_Container.Resolve <ISelkieBus>();
 
             m_SpecFlowService = new SpecFlowService();
             m_SpecFlowService.DeleteQueues();
@@ -60,8 +57,8 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
         {
             ScenarioContext.Current [ "IsReceivedPingResponse" ] = false;
 
-            SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedPingResponse" ],
-                           WhenISendAPingMessage);
+            Helper.SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedPingResponse" ],
+                                  WhenISendAPingMessage);
 
             Assert.True(( bool ) ScenarioContext.Current [ "IsReceivedPingResponse" ],
                         "Didn't receive ping response!");
@@ -69,26 +66,9 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
 
         private void WhenISendAPingMessage()
         {
-            var bus = ( IBus ) ScenarioContext.Current [ "IBus" ];
+            var bus = ( ISelkieBus ) ScenarioContext.Current [ "ISelkieBus" ];
 
             bus.PublishAsync(new PingRequestMessage());
-        }
-
-        // todo duplicated code in BaseStep
-        public void SleepWaitAndDo([NotNull] Func <bool> breakIfTrue,
-                                   [NotNull] Action doSomething)
-        {
-            for ( var i = 0 ; i < 10 ; i++ )
-            {
-                Thread.Sleep(SleepTime);
-
-                if ( breakIfTrue() )
-                {
-                    break;
-                }
-
-                doSomething();
-            }
         }
     }
 }

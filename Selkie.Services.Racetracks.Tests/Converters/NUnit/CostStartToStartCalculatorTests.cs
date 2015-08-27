@@ -1,11 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Castle.Core.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using Selkie.Geometry.Primitives;
 using Selkie.NUnit.Extensions;
 using Selkie.Racetrack;
 using Selkie.Services.Racetracks.Converters;
+using Selkie.Windsor;
 using Constants = Selkie.Common.Constants;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
@@ -30,7 +30,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
 
             m_Racetracks = Substitute.For <IRacetracks>();
 
-            m_Calculator = new CostStartToStartCalculator(Substitute.For <ILogger>());
+            m_Calculator = new CostStartToStartCalculator(Substitute.For <ISelkieLogger>());
         }
 
         private CostStartToStartCalculator m_Calculator;

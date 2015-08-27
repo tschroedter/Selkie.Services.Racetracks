@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
-using Castle.Core.Logging;
-using EasyNetQ;
 using NSubstitute;
 using NUnit.Framework;
+using Selkie.EasyNetQ;
 using Selkie.Geometry.Primitives;
 using Selkie.Services.Racetracks.Common.Messages;
+using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks.Tests.NUnit
 {
@@ -18,15 +17,15 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         [SetUp]
         public void Setup()
         {
-            m_Logger = Substitute.For <ILogger>();
-            m_Bus = Substitute.For <IBus>();
+            m_Logger = Substitute.For <ISelkieLogger>();
+            m_Bus = Substitute.For <ISelkieBus>();
 
             m_Manager = new RacetrackSettingsSourceManager(m_Logger,
                                                            m_Bus);
         }
 
-        private IBus m_Bus;
-        private ILogger m_Logger;
+        private ISelkieBus m_Bus;
+        private ISelkieLogger m_Logger;
         private RacetrackSettingsSourceManager m_Manager;
 
         [Test]
@@ -146,14 +145,14 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         public void SubscribesToRacetrackSettingsGetMessageTest()
         {
             m_Bus.Received().SubscribeAsync(m_Manager.GetType().ToString(),
-                                            Arg.Any <Func <RacetrackSettingsGetMessage, Task>>());
+                                            Arg.Any <Action <RacetrackSettingsGetMessage>>());
         }
 
         [Test]
         public void SubscribesToRacetrackSettingsSetMessageTest()
         {
             m_Bus.Received().SubscribeAsync(m_Manager.GetType().ToString(),
-                                            Arg.Any <Func <RacetrackSettingsSetMessage, Task>>());
+                                            Arg.Any <Action <RacetrackSettingsSetMessage>>());
         }
     }
 }

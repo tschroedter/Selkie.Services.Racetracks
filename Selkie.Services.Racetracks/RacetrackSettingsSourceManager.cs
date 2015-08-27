@@ -1,9 +1,7 @@
 ﻿using System;
 using Castle.Core;
-using Castle.Core.Logging;
-using EasyNetQ;
 using JetBrains.Annotations;
-using Selkie.EasyNetQ.Extensions;
+using Selkie.EasyNetQ;
 using Selkie.Geometry.Primitives;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor;
@@ -16,25 +14,23 @@ namespace Selkie.Services.Racetracks
         : IRacetrackSettingsSourceManager,
           IStartable
     {
-        private readonly IBus m_Bus;
-        private readonly ILogger m_Logger;
+        private readonly ISelkieBus m_Bus;
+        private readonly ISelkieLogger m_Logger;
         private IRacetrackSettingsSource m_Source = RacetrackSettingsSource.Default;
 
-        public RacetrackSettingsSourceManager([NotNull] ILogger logger,
-                                              [NotNull] IBus bus)
+        public RacetrackSettingsSourceManager([NotNull] ISelkieLogger logger,
+                                              [NotNull] ISelkieBus bus)
         {
             m_Logger = logger;
             m_Bus = bus;
 
             string subscriptionId = GetType().ToString();
 
-            bus.SubscribeHandlerAsync <RacetrackSettingsSetMessage>(logger,
-                                                                    subscriptionId,
-                                                                    RacetrackSettingsSetHandler);
+            bus.SubscribeAsync <RacetrackSettingsSetMessage>(subscriptionId,
+                                                             RacetrackSettingsSetHandler);
 
-            bus.SubscribeHandlerAsync <RacetrackSettingsGetMessage>(logger,
-                                                                    subscriptionId,
-                                                                    RacetrackSettingsGetHandler);
+            bus.SubscribeAsync <RacetrackSettingsGetMessage>(subscriptionId,
+                                                             RacetrackSettingsGetHandler);
         }
 
         public IRacetrackSettingsSource Source

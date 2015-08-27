@@ -9,10 +9,10 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps
         [Then(@"the result should be that I received a RacetracksChangedMessage")]
         public override void Do()
         {
-            SleepWaitAndDo(() => (bool)ScenarioContext.Current["IsReceivedRacetracksChangedMessage"],
+            SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedRacetracksChangedMessage" ],
                            DoNothing);
 
-            Assert.True((bool)ScenarioContext.Current["IsReceivedRacetracksChangedMessage"],
+            Assert.True(( bool ) ScenarioContext.Current [ "IsReceivedRacetracksChangedMessage" ],
                         "Did not receive RacetracksChangedMessage!");
         }
     }

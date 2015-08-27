@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Castle.Core.Logging;
 using JetBrains.Annotations;
 using Selkie.Geometry.Shapes;
 using Selkie.Racetrack;
@@ -28,7 +27,7 @@ namespace Selkie.Services.Racetracks
         {
         }
 
-        public CostMatrix([NotNull] ILogger logger,
+        public CostMatrix([NotNull] ISelkieLogger logger,
                           [NotNull] ILinesSourceManager linesSourceManager,
                           [NotNull] IRacetracksSourceManager racetracksSourceManager,
                           [NotNull] IConverterFactory converterFactory)
@@ -58,7 +57,7 @@ namespace Selkie.Services.Racetracks
             }
         }
 
-        public IRacetracks Racetracks // todo testing
+        public IRacetracks Racetracks
         {
             get
             {
@@ -71,7 +70,7 @@ namespace Selkie.Services.Racetracks
             IEnumerable <ILine> sourceLines = m_LinesSourceManager.Lines;
             m_Lines = sourceLines.ToArray();
             m_Matrix = CreateMatrix(m_Lines);
-            m_Racetracks = m_RacetracksSourceManager.Racetracks; // todo testing
+            m_Racetracks = m_RacetracksSourceManager.Racetracks;
         }
 
         [NotNull]

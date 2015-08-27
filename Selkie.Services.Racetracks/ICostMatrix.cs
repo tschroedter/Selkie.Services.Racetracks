@@ -13,7 +13,6 @@ namespace Selkie.Services.Racetracks
         [NotNull]
         double[][] Matrix { get; }
 
-        IRacetracks Racetracks // todo testing
-        { get; }
+        IRacetracks Racetracks { get; }
     }
 }

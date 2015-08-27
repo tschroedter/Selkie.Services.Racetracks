@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Castle.Core.Logging;
 using NSubstitute;
 using NUnit.Framework;
 using Selkie.Geometry.Shapes;
@@ -7,6 +6,7 @@ using Selkie.NUnit.Extensions;
 using Selkie.Racetrack;
 using Selkie.Services.Racetracks.Converters;
 using Selkie.Services.Racetracks.TypedFactories;
+using Selkie.Windsor;
 using Constants = Selkie.Common.Constants;
 
 namespace Selkie.Services.Racetracks.Tests.NUnit
@@ -478,6 +478,13 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
+        public void RacetracksDefaultTest()
+        {
+            Assert.AreEqual(m_RacetracksSourceManager.Racetracks,
+                            m_CostMatrix.Racetracks);
+        }
+
+        [Test]
         public void ToStringTest()
         {
             const string expected =
@@ -527,7 +534,7 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
 
             m_RacetracksSourceManager = Substitute.For <IRacetracksSourceManager>();
 
-            m_CostMatrix = new CostMatrix(Substitute.For <ILogger>(),
+            m_CostMatrix = new CostMatrix(Substitute.For <ISelkieLogger>(),
                                           m_LinesSourceManager,
                                           m_RacetracksSourceManager,
                                           m_ConverterFactory);

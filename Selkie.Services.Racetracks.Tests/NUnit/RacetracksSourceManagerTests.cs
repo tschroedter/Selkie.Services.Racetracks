@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Threading.Tasks;
-using Castle.Core.Logging;
-using EasyNetQ;
 using NSubstitute;
 using NUnit.Framework;
+using Selkie.EasyNetQ;
 using Selkie.Geometry.Primitives;
 using Selkie.Geometry.Shapes;
 using Selkie.Racetrack;
 using Selkie.Racetrack.Calculators;
 using Selkie.Services.Racetracks.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
+using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks.Tests.NUnit
 {
@@ -24,8 +23,8 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         [SetUp]
         public void Setup()
         {
-            m_Bus = Substitute.For <IBus>();
-            m_Bus = Substitute.For <IBus>();
+            m_Bus = Substitute.For <ISelkieBus>();
+            m_Bus = Substitute.For <ISelkieBus>();
             m_RacetracksDto = new RacetracksDto();
             m_Converter = Substitute.For <IRacetracksToDtoConverter>();
             m_Converter.ConvertPaths(null).ReturnsForAnyArgs(m_RacetracksDto);
@@ -64,13 +63,13 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         private IRacetracksCalculator m_RacetracksCalculator;
         private IRacetrackSettingsSource m_RacetrackSettingsSource;
         private IRacetrackSettingsSourceManager m_RacetrackSettingsSourceManager;
-        private IBus m_Bus;
+        private ISelkieBus m_Bus;
         private IRacetracksToDtoConverter m_Converter;
         private RacetracksDto m_RacetracksDto;
 
         private RacetracksSourceManager CreateSut()
         {
-            var manager = new RacetracksSourceManager(Substitute.For <ILogger>(),
+            var manager = new RacetracksSourceManager(Substitute.For <ISelkieLogger>(),
                                                       m_Bus,
                                                       m_LinesSourceManager,
                                                       m_RacetrackSettingsSourceManager,
@@ -106,6 +105,14 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
 
             // assert
             m_Factory.Received().Release(m_RacetracksCalculator);
+        }
+
+        [Test]
+        public void CalculateSendsMessageTest()
+        {
+            m_Manager.Update();
+
+            m_Bus.Received().PublishAsync(Arg.Any <RacetracksChangedMessage>());
         }
 
         [Test]
@@ -215,6 +222,18 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
+        public void SendsRacetrackSettingsGetMessageTest()
+        {
+            // assemble
+            // ReSharper disable once UnusedVariable
+            RacetracksSourceManager sut = CreateSut();
+
+            // act
+            // assert
+            m_Bus.Received().PublishAsync(Arg.Any <RacetrackSettingsGetMessage>());
+        }
+
+        [Test]
         public void SubscribesToRacetrackSettingsChangedMessageTest()
         {
             // assemble
@@ -225,7 +244,7 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
 
             // assert
             m_Bus.Received().SubscribeAsync(subscriptionId,
-                                            Arg.Any <Func <RacetrackSettingsChangedMessage, Task>>());
+                                            Arg.Any <Action <RacetrackSettingsChangedMessage>>());
         }
 
         [Test]
@@ -239,7 +258,7 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
 
             // assert
             m_Bus.Received().SubscribeAsync(subscriptionId,
-                                            Arg.Any <Func <RacetracksGetMessage, Task>>());
+                                            Arg.Any <Action <RacetracksGetMessage>>());
         }
     }
 }

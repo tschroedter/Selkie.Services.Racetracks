@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Threading.Tasks;
-using Castle.Core.Logging;
-using EasyNetQ;
 using JetBrains.Annotations;
 using NSubstitute;
 using Ploeh.AutoFixture.Xunit;
+using Selkie.EasyNetQ;
 using Selkie.Geometry.Shapes;
 using Selkie.Services.Racetracks.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
+using Selkie.Windsor;
 using Selkie.XUnit.Extensions;
 using Xunit;
 using Xunit.Extensions;
@@ -24,7 +23,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
     {
         [Theory]
         [AutoNSubstituteData]
-        public void SubscribesToLinesSetMessageTest([NotNull] [Frozen] IBus bus,
+        public void SubscribesToLinesSetMessageTest([NotNull] [Frozen] ISelkieBus bus,
                                                     [NotNull] LinesSourceManager manager)
         {
             // assemble
@@ -33,7 +32,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
             string subscriptionId = manager.GetType().FullName;
 
             bus.Received().SubscribeAsync(subscriptionId,
-                                          Arg.Any <Func <LinesSetMessage, Task>>());
+                                          Arg.Any <Action <LinesSetMessage>>());
         }
 
         [Theory]
@@ -55,7 +54,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
         [Theory]
         [AutoNSubstituteData]
-        public void LinesSetMessageHandlerLogsErrorForLineDtosIsNullTest([NotNull] [Frozen] ILogger logger,
+        public void LinesSetMessageHandlerLogsErrorForLineDtosIsNullTest([NotNull] [Frozen] ISelkieLogger logger,
                                                                          [NotNull] LinesSourceManager manager)
         {
             // assemble
@@ -91,7 +90,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
         [Theory]
         [AutoNSubstituteData]
-        public void LinesSetMessageHandlerSendsResponseTest([NotNull] [Frozen] IBus bus,
+        public void LinesSetMessageHandlerSendsResponseTest([NotNull] [Frozen] ISelkieBus bus,
                                                             [NotNull] [Frozen] ILinesValidator validator,
                                                             [NotNull] LinesSourceManager manager)
         {
@@ -113,7 +112,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
         [Theory]
         [AutoNSubstituteData]
-        public void LinesSetMessageHandlerIgnorsSetForInvalidLineDtoTest([NotNull] [Frozen] IBus bus,
+        public void LinesSetMessageHandlerIgnorsSetForInvalidLineDtoTest([NotNull] [Frozen] ISelkieBus bus,
                                                                          [NotNull] LinesSourceManager manager)
         {
             // assemble
@@ -139,7 +138,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
         [Theory]
         [AutoNSubstituteData]
-        public void StartCallsLoggerTest([NotNull] [Frozen] ILogger logger,
+        public void StartCallsLoggerTest([NotNull] [Frozen] ISelkieLogger logger,
                                          [NotNull] LinesSourceManager manager)
         {
             // assemble
@@ -152,7 +151,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
         [Theory]
         [AutoNSubstituteData]
-        public void StopCallsLoggerTest([NotNull] [Frozen] ILogger logger,
+        public void StopCallsLoggerTest([NotNull] [Frozen] ISelkieLogger logger,
                                         [NotNull] LinesSourceManager manager)
         {
             // assemble

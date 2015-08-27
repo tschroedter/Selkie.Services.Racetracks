@@ -1,6 +1,6 @@
-using Castle.Core.Logging;
 using JetBrains.Annotations;
 using Selkie.Racetrack;
+using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks.Converters
 {
@@ -8,7 +8,7 @@ namespace Selkie.Services.Racetracks.Converters
         : BaseCostCalculator,
           ICostStartToEndCalculator
     {
-        public CostStartToEndCalculator([NotNull] ILogger logger)
+        public CostStartToEndCalculator([NotNull] ISelkieLogger logger)
             : base(logger)
         {
         }

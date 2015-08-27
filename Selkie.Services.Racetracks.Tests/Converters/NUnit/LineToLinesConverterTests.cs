@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Castle.Core.Logging;
 using JetBrains.Annotations;
 using NSubstitute;
 using NUnit.Framework;
@@ -8,6 +7,7 @@ using Selkie.Geometry.Shapes;
 using Selkie.NUnit.Extensions;
 using Selkie.Racetrack;
 using Selkie.Services.Racetracks.Converters;
+using Selkie.Windsor;
 using Constants = Selkie.Common.Constants;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
@@ -23,7 +23,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
             ComfigureLines();
             ConfigureRacetracks();
 
-            m_Logger = Substitute.For <ILogger>();
+            m_Logger = Substitute.For <ISelkieLogger>();
 
             m_Converter = new LineToLinesConverter(new CostStartToStartCalculator(m_Logger),
                                                    new CostStartToEndCalculator(m_Logger),
@@ -48,7 +48,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.NUnit
         private IRacetracks m_Racetracks;
         private IPath[][] m_ReverseForwardPaths;
         private IPath[][] m_ReverseReversePaths;
-        private ILogger m_Logger;
+        private ISelkieLogger m_Logger;
 
         private void ComfigureLines()
         {

@@ -1,6 +1,4 @@
-﻿using Castle.Core.Logging;
-using EasyNetQ;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Selkie.EasyNetQ;
 using Selkie.Services.Common;
 using Selkie.Services.Common.Messages;
@@ -15,8 +13,8 @@ namespace Selkie.Services.Racetracks
     {
         public const string ServiceName = "Racetracks Service";
 
-        public Service([NotNull] IBus bus,
-                       [NotNull] ILogger logger,
+        public Service([NotNull] ISelkieBus bus,
+                       [NotNull] ISelkieLogger logger,
                        [NotNull] ISelkieManagementClient client)
             : base(bus,
                    logger,

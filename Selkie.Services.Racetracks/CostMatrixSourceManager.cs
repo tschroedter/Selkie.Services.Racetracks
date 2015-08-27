@@ -1,8 +1,6 @@
 ﻿using Castle.Core;
-using Castle.Core.Logging;
-using EasyNetQ;
 using JetBrains.Annotations;
-using Selkie.EasyNetQ.Extensions;
+using Selkie.EasyNetQ;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Services.Racetracks.TypedFactories;
 using Selkie.Windsor;
@@ -15,14 +13,14 @@ namespace Selkie.Services.Racetracks
         : ICostMatrixSourceManager,
           IStartable
     {
-        private readonly IBus m_Bus;
+        private readonly ISelkieBus m_Bus;
         private readonly ICostMatrixFactory m_Factory;
-        private readonly ILogger m_Logger;
+        private readonly ISelkieLogger m_Logger;
         private readonly object m_Padlock = new object();
         private ICostMatrix m_Source = CostMatrix.Unkown;
 
-        public CostMatrixSourceManager([NotNull] IBus bus,
-                                       [NotNull] ILogger logger,
+        public CostMatrixSourceManager([NotNull] ISelkieBus bus,
+                                       [NotNull] ISelkieLogger logger,
                                        [NotNull] ICostMatrixFactory factory)
         {
             m_Bus = bus;
@@ -31,17 +29,14 @@ namespace Selkie.Services.Racetracks
 
             string subscriptionId = GetType().FullName;
 
-            m_Bus.SubscribeHandlerAsync <CostMatrixCalculateMessage>(logger,
-                                                                     subscriptionId,
-                                                                     CostMatrixCalculateHandler);
+            m_Bus.SubscribeAsync <CostMatrixCalculateMessage>(subscriptionId,
+                                                              CostMatrixCalculateHandler);
 
-            m_Bus.SubscribeHandlerAsync <CostMatrixGetMessage>(logger,
-                                                               subscriptionId,
-                                                               CostMatrixGetHandler);
+            m_Bus.SubscribeAsync <CostMatrixGetMessage>(subscriptionId,
+                                                        CostMatrixGetHandler);
 
-            m_Bus.SubscribeHandlerAsync <RacetracksChangedMessage>(logger,
-                                                                   subscriptionId,
-                                                                   RacetracksChangedHandler);
+            m_Bus.SubscribeAsync <RacetracksChangedMessage>(subscriptionId,
+                                                            RacetracksChangedHandler);
 
             m_Bus.PublishAsync(new RacetrackSettingsGetMessage());
         }

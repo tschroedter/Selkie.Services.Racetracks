@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Castle.Core;
-using Castle.Core.Logging;
-using EasyNetQ;
 using JetBrains.Annotations;
-using Selkie.EasyNetQ.Extensions;
+using Selkie.EasyNetQ;
 using Selkie.Geometry.Shapes;
 using Selkie.Services.Racetracks.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
@@ -18,22 +16,21 @@ namespace Selkie.Services.Racetracks
         : ILinesSourceManager,
           IStartable
     {
-        private readonly IBus m_Bus;
-        private readonly ILogger m_Logger;
+        private readonly ISelkieBus m_Bus;
+        private readonly ISelkieLogger m_Logger;
         private readonly ILinesValidator m_Validator;
         private IEnumerable <ILine> m_Lines = new Line[0];
 
-        public LinesSourceManager([NotNull] ILogger logger,
-                                  [NotNull] IBus bus,
+        public LinesSourceManager([NotNull] ISelkieLogger logger,
+                                  [NotNull] ISelkieBus bus,
                                   [NotNull] ILinesValidator validator)
         {
             m_Logger = logger;
             m_Bus = bus;
             m_Validator = validator;
 
-            m_Bus.SubscribeHandlerAsync <LinesSetMessage>(logger,
-                                                          GetType().FullName,
-                                                          LinesSetMessageHandler);
+            m_Bus.SubscribeAsync <LinesSetMessage>(GetType().FullName,
+                                                   LinesSetMessageHandler);
         }
 
         public IEnumerable <ILine> Lines

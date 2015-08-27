@@ -4,10 +4,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Castle.Core.Logging;
-using EasyNetQ;
 using JetBrains.Annotations;
-using Selkie.EasyNetQ.Extensions;
+using Selkie.EasyNetQ;
 using Selkie.Services.Common;
 using Selkie.Services.Racetracks.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
@@ -20,7 +18,7 @@ namespace Selkie.Services.Racetracks.Console.Client
     public class CallService
     {
         private static readonly TimeSpan SleepTime = TimeSpan.FromSeconds(1.0);
-        private readonly IBus m_Bus;
+        private readonly ISelkieBus m_Bus;
         private readonly ISelkieConsole m_SelkieConsole;
         private bool m_IsReceivedCostMatrixChangedMessage;
         private bool m_IsReceivedLinesChangedMessage;
@@ -29,29 +27,23 @@ namespace Selkie.Services.Racetracks.Console.Client
         private double[][] m_Matrix;
         private RacetracksDto m_Racetracks;
 
-        public CallService([NotNull] IBus bus,
-                           [NotNull] ILogger logger,
+        public CallService([NotNull] ISelkieBus bus,
                            [NotNull] ISelkieConsole selkieConsole)
         {
             m_Bus = bus;
             m_SelkieConsole = selkieConsole;
-            ILogger logger1 = logger;
 
-            m_Bus.SubscribeHandlerAsync <LinesChangedMessage>(logger1,
-                                                              GetType().FullName,
-                                                              LinesChangedHandler);
+            m_Bus.SubscribeAsync <LinesChangedMessage>(GetType().FullName,
+                                                       LinesChangedHandler);
 
-            m_Bus.SubscribeHandlerAsync <RacetrackSettingsChangedMessage>(logger1,
-                                                                          GetType().FullName,
-                                                                          RacetrackSettingsChangedHandler);
+            m_Bus.SubscribeAsync <RacetrackSettingsChangedMessage>(GetType().FullName,
+                                                                   RacetrackSettingsChangedHandler);
 
-            m_Bus.SubscribeHandlerAsync <CostMatrixChangedMessage>(logger1,
-                                                                   GetType().FullName,
-                                                                   CostMatrixChangedHandler);
+            m_Bus.SubscribeAsync <CostMatrixChangedMessage>(GetType().FullName,
+                                                            CostMatrixChangedHandler);
 
-            m_Bus.SubscribeHandlerAsync <RacetracksChangedMessage>(logger1,
-                                                                   GetType().FullName,
-                                                                   RacetracksChangedHandler);
+            m_Bus.SubscribeAsync <RacetracksChangedMessage>(GetType().FullName,
+                                                            RacetracksChangedHandler);
         }
 
         private void RacetracksChangedHandler(RacetracksChangedMessage message)
