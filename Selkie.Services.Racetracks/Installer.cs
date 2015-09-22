@@ -10,6 +10,11 @@ namespace Selkie.Services.Racetracks
 {
     public class Installer : BaseInstaller <Installer>
     {
+        public override string GetPrefixOfDllsToInstall()
+        {
+            return "Selkie.";
+        }
+
         protected override void InstallComponents(IWindsorContainer container,
                                                   IConfigurationStore store)
         {

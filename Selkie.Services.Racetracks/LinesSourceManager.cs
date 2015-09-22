@@ -2,6 +2,7 @@
 using System.Linq;
 using Castle.Core;
 using JetBrains.Annotations;
+using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
 using Selkie.Geometry.Shapes;
 using Selkie.Services.Racetracks.Common.Dto;
@@ -11,6 +12,7 @@ using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
+    [Interceptor(typeof(MessageHandlerAspect))]
     [ProjectComponent(Lifestyle.Singleton)]
     public class LinesSourceManager
         : ILinesSourceManager,

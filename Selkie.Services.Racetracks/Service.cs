@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using Castle.Core;
+using JetBrains.Annotations;
+using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
 using Selkie.Services.Common;
 using Selkie.Services.Common.Messages;
@@ -6,6 +8,7 @@ using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks
 {
+    [Interceptor(typeof(MessageHandlerAspect))]
     [ProjectComponent(Lifestyle.Singleton)]
     public class Service
         : BaseService,

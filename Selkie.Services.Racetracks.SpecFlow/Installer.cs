@@ -10,5 +10,9 @@ namespace Selkie.Services.Racetracks.SpecFlow
         : BasicConsoleInstaller,
           IWindsorInstaller
     {
+        public override string GetPrefixOfDllsToInstall()
+        {
+            return "Selkie.";
+        }
     }
 }

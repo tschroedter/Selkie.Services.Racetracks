@@ -1,6 +1,7 @@
 ﻿using System;
 using Castle.Core;
 using JetBrains.Annotations;
+using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
 using Selkie.Geometry.Primitives;
 using Selkie.Services.Racetracks.Common.Messages;
@@ -9,6 +10,8 @@ using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
+    // todo move message handlers into separate classes, check all other classes as well
+    [Interceptor(typeof(MessageHandlerAspect))]
     [ProjectComponent(Lifestyle.Singleton)]
     public class RacetrackSettingsSourceManager
         : IRacetrackSettingsSourceManager,

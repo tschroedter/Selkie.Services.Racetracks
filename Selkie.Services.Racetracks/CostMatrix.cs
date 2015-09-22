@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Castle.Core;
 using JetBrains.Annotations;
+using Selkie.Aop.Aspects;
 using Selkie.Geometry.Shapes;
 using Selkie.Racetrack;
 using Selkie.Services.Racetracks.Converters;
@@ -11,6 +13,7 @@ using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
+    [Interceptor(typeof(LogAspect))]
     [ProjectComponent(Lifestyle.Transient)]
     public sealed class CostMatrix : ICostMatrix
     {

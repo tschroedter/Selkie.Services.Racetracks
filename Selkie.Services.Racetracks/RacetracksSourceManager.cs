@@ -1,5 +1,7 @@
 ﻿using System;
+using Castle.Core;
 using JetBrains.Annotations;
+using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
 using Selkie.Racetrack;
 using Selkie.Racetrack.Calculators;
@@ -12,6 +14,7 @@ namespace Selkie.Services.Racetracks
 {
     // todo discovered problem when turn circle is 40 and distance between lines is 30 will not find a path
     //      -=> at the moment the algorithm can only handle circles, circle-line-circle, but not circle-line-circle ->line-> circle-line-circle
+    [Interceptor(typeof(MessageHandlerAspect))]
     [ProjectComponent(Lifestyle.Singleton)]
     public sealed class RacetracksSourceManager
         : IRacetracksSourceManager,
@@ -22,7 +25,6 @@ namespace Selkie.Services.Racetracks
         private readonly ICalculatorFactory m_Factory;
         private readonly ILinesSourceManager m_LinesSourceManager;
         private readonly ISelkieLogger m_Logger;
-        private readonly object m_Padlock = new object();
         private readonly IRacetrackSettingsSourceManager m_RacetrackSettingsSourceManager;
         private IRacetracksCalculator m_RacetracksCalculator;
 
@@ -69,10 +71,7 @@ namespace Selkie.Services.Racetracks
 
         internal void RacetrackSettingsChangedHandler(RacetrackSettingsChangedMessage message)
         {
-            lock ( m_Padlock ) // todo move lock into message subscriber handler code
-            {
-                Update();
-            }
+            Update();
         }
 
         internal void Update()
