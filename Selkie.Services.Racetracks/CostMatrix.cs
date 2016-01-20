@@ -13,7 +13,7 @@ using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
-    [Interceptor(typeof(LogAspect))]
+    [Interceptor(typeof ( LogAspect ))]
     [ProjectComponent(Lifestyle.Transient)]
     public sealed class CostMatrix : ICostMatrix
     {

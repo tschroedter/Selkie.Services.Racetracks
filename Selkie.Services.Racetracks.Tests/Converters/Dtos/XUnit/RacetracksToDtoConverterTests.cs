@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using NSubstitute;
 using Selkie.Racetrack;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
 using Selkie.XUnit.Extensions;
 using Xunit;

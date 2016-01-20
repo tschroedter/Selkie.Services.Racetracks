@@ -5,14 +5,14 @@ using JetBrains.Annotations;
 using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
 using Selkie.Geometry.Shapes;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor;
 using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
-    [Interceptor(typeof(MessageHandlerAspect))]
+    [Interceptor(typeof ( MessageHandlerAspect ))]
     [ProjectComponent(Lifestyle.Singleton)]
     public class LinesSourceManager
         : ILinesSourceManager,

@@ -3,7 +3,7 @@ using NSubstitute;
 using Selkie.Geometry;
 using Selkie.Geometry.Shapes;
 using Selkie.Racetrack;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
 using Selkie.XUnit.Extensions;
 using Xunit;
@@ -13,6 +13,8 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
 {
     public class PathToPathDtoConverterTests
     {
+        private const int DoNotCareId = -1;
+
         [Theory]
         [AutoNSubstituteData]
         public void Path_Roundtrip_ForPath([NotNull] IPath path,
@@ -138,7 +140,9 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
             ILine lineSegment = CreateLineSegment();
             ArcSegment endSegment = CreateEndArcSegment();
 
-            var polyline = new Polyline();
+            var polyline = new Polyline(DoNotCareId,
+                                        Constants.LineDirection.Forward);
+
             polyline.AddSegment(startSegment);
             polyline.AddSegment(lineSegment);
             polyline.AddSegment(endSegment);
@@ -158,8 +162,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
 
             return new ArcSegment(circle,
                                   startPoint,
-                                  endPoint,
-                                  Constants.TurnDirection.Clockwise);
+                                  endPoint);
         }
 
         private ILine CreateLineSegment()
@@ -182,8 +185,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
 
             return new ArcSegment(circle,
                                   startPoint,
-                                  endPoint,
-                                  Constants.TurnDirection.Clockwise);
+                                  endPoint);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
 using Selkie.Racetrack;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks.Converters.Dtos

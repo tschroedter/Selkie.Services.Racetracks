@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Selkie.Geometry;
 using Selkie.Geometry.Shapes;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests.XUnit

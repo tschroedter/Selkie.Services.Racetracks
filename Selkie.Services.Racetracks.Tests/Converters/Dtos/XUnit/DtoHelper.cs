@@ -1,7 +1,7 @@
 using System;
 using Selkie.Geometry.Shapes;
 using Selkie.NUnit.Extensions;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit

@@ -5,7 +5,7 @@ using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
 using Selkie.Racetrack;
 using Selkie.Racetrack.Calculators;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor;
 using Selkie.Windsor.Extensions;
@@ -14,7 +14,7 @@ namespace Selkie.Services.Racetracks
 {
     // todo discovered problem when turn circle is 40 and distance between lines is 30 will not find a path
     //      -=> at the moment the algorithm can only handle circles, circle-line-circle, but not circle-line-circle ->line-> circle-line-circle
-    [Interceptor(typeof(MessageHandlerAspect))]
+    [Interceptor(typeof ( MessageHandlerAspect ))]
     [ProjectComponent(Lifestyle.Singleton)]
     public sealed class RacetracksSourceManager
         : IRacetracksSourceManager,

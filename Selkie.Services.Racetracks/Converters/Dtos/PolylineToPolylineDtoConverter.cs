@@ -1,15 +1,15 @@
 using System.Linq;
 using JetBrains.Annotations;
 using Selkie.Geometry.Shapes;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 
 namespace Selkie.Services.Racetracks.Converters.Dtos
 {
     public class PolylineToPolylineDtoConverter : IPolylineToPolylineDtoConverter
     {
         private readonly ISegmentToSegmentDtoConverter m_SegmentToSegmentDto;
-        private PolylineDto m_Dto = new PolylineDto();
-        private IPolyline m_Polyline = new Polyline(); // todo Polyline.Unknown
+        private PolylineDto m_Dto = new PolylineDto(); // todo add Id to DTO check for direction
+        private IPolyline m_Polyline = Geometry.Shapes.Polyline.Unknown;
 
         public PolylineToPolylineDtoConverter([NotNull] ISegmentToSegmentDtoConverter segmentToSegmentDto)
         {

@@ -99,16 +99,20 @@
       <HintPath>..\packages\Selkie.Aop.0.6.5.0\lib\net45\Selkie.Aop.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.EasyNetQ, Version=0.6.185.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.EasyNetQ.0.6.185.0\lib\net45\Selkie.EasyNetQ.dll</HintPath>
+    <Reference Include="Selkie.EasyNetQ, Version=0.6.186.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.EasyNetQ.0.6.186.0\lib\net45\Selkie.EasyNetQ.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Selkie.Services.Common, Version=0.6.143.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Selkie.Services.Common.0.6.143.0\lib\net45\Selkie.Services.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Services.Racetracks.Common, Version=0.6.54.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Services.Racetracks.Common.0.6.54.0\lib\net45\Selkie.Services.Racetracks.Common.dll</HintPath>
+    <Reference Include="Selkie.Services.Common.Dto, Version=0.6.10.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Services.Common.Dto.0.6.10.0\lib\net45\Selkie.Services.Common.Dto.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Selkie.Services.Racetracks.Common, Version=0.6.58.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Services.Racetracks.Common.0.6.58.0\lib\net45\Selkie.Services.Racetracks.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Selkie.Windsor, Version=0.6.243.0, Culture=neutral, processorArchitecture=MSIL">

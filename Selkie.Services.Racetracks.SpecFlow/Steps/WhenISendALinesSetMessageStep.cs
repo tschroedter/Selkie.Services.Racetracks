@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Services.Racetracks.SpecFlow.Steps.Common;
 using TechTalk.SpecFlow;

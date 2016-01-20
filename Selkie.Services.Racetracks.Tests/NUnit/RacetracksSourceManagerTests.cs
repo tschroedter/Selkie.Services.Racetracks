@@ -8,7 +8,7 @@ using Selkie.Geometry.Primitives;
 using Selkie.Geometry.Shapes;
 using Selkie.Racetrack;
 using Selkie.Racetrack.Calculators;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor;
 

@@ -13,6 +13,8 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
 {
     public class PolylineToPolylineDtoConverterTests
     {
+        private const int DoNotCareId = -1;
+
         [Fact]
         public void Polyline_Updates_ForNewPolyline()
         {
@@ -38,7 +40,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
             sut.Convert();
 
             // Assert
-            Assert.True(sut.Dto.Segments.Count() == polyline.Segments.Count(),
+            Assert.True(sut.Dto.Segments.Length == polyline.Segments.Count(),
                         "Segments count");
         }
 
@@ -48,7 +50,9 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
             ILine lineSegment = CreateLineSegment();
             ArcSegment endSegment = CreateEndArcSegment();
 
-            var polyline = new Polyline();
+            var polyline = new Polyline(DoNotCareId,
+                                        Constants.LineDirection.Forward);
+
             polyline.AddSegment(startSegment);
             polyline.AddSegment(lineSegment);
             polyline.AddSegment(endSegment);
@@ -68,8 +72,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
 
             return new ArcSegment(circle,
                                   startPoint,
-                                  endPoint,
-                                  Constants.TurnDirection.Clockwise);
+                                  endPoint);
         }
 
         private ILine CreateLineSegment()
@@ -92,8 +95,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
 
             return new ArcSegment(circle,
                                   startPoint,
-                                  endPoint,
-                                  Constants.TurnDirection.Clockwise);
+                                  endPoint);
         }
 
         private static PolylineToPolylineDtoConverter CreateSut()

@@ -7,7 +7,7 @@ using System.Threading;
 using JetBrains.Annotations;
 using Selkie.EasyNetQ;
 using Selkie.Services.Common;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor.Extensions;
 

@@ -7,7 +7,7 @@ using NSubstitute;
 using Ploeh.AutoFixture.Xunit;
 using Selkie.EasyNetQ;
 using Selkie.Geometry.Shapes;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor;
 using Selkie.XUnit.Extensions;
@@ -84,7 +84,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
             // assert
             IEnumerable <ILine> actual = manager.Lines;
 
-            Assert.Equal(dtos.Count(),
+            Assert.Equal(dtos.Length,
                          actual.Count());
         }
 
@@ -107,7 +107,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
             manager.LinesSetMessageHandler(message);
 
             // assert
-            bus.Received().PublishAsync(Arg.Is <LinesChangedMessage>(m => m.LineDtos.Count() == dtos.Count()));
+            bus.Received().PublishAsync(Arg.Is <LinesChangedMessage>(m => m.LineDtos.Length == dtos.Length));
         }
 
         [Theory]
@@ -133,7 +133,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
             manager.LinesSetMessageHandler(messageInvalid);
 
             // assert
-            bus.Received().PublishAsync(Arg.Is <LinesChangedMessage>(m => m.LineDtos.Count() == valid.Count()));
+            bus.Received().PublishAsync(Arg.Is <LinesChangedMessage>(m => m.LineDtos.Length == valid.Length));
         }
 
         [Theory]

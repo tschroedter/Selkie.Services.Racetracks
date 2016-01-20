@@ -1,5 +1,5 @@
 using Selkie.Geometry.Shapes;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
 using Xunit;
 

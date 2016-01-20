@@ -1,7 +1,7 @@
 using System;
 using Selkie.Geometry;
 using Selkie.Geometry.Shapes;
-using Selkie.Services.Racetracks.Common.Dto;
+using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
 using Selkie.Windsor.Extensions;
 using Xunit;
@@ -122,8 +122,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos.XUnit
 
             var arcSegment = new ArcSegment(circle,
                                             startPoint,
-                                            endPoint,
-                                            Constants.TurnDirection.Clockwise);
+                                            endPoint);
 
             return arcSegment;
         }
