@@ -1,51 +1,31 @@
-using JetBrains.Annotations;
-using Selkie.Geometry.Primitives;
-
 namespace Selkie.Services.Racetracks
 {
     public class RacetrackSettingsSource : IRacetrackSettingsSource
     {
-        internal static readonly Distance DefaultRadius = new Distance(60.0);
+        internal static readonly double DefaultRadius = 60.0;
 
         public static readonly RacetrackSettingsSource Default = new RacetrackSettingsSource(DefaultRadius,
+                                                                                             DefaultRadius,
                                                                                              true,
                                                                                              true);
 
-        private readonly bool m_IsPortTurnAllowed;
-        private readonly bool m_IsStarboardTurnAllowed;
-        private readonly Distance m_TurnRadius;
-
-        public RacetrackSettingsSource([NotNull] Distance turnRadius,
+        public RacetrackSettingsSource(double turnRadiusForPort,
+                                       double turnRadiusForStarboard,
                                        bool isPortTurnAllowed,
                                        bool isStarboardTurnAllowed)
         {
-            m_TurnRadius = turnRadius;
-            m_IsPortTurnAllowed = isPortTurnAllowed;
-            m_IsStarboardTurnAllowed = isStarboardTurnAllowed;
+            TurnRadiusForPort = turnRadiusForPort;
+            TurnRadiusForStarboard = turnRadiusForStarboard;
+            IsPortTurnAllowed = isPortTurnAllowed;
+            IsStarboardTurnAllowed = isStarboardTurnAllowed;
         }
 
-        public Distance TurnRadius
-        {
-            get
-            {
-                return m_TurnRadius;
-            }
-        }
+        public double TurnRadiusForStarboard { get; private set; }
 
-        public bool IsPortTurnAllowed
-        {
-            get
-            {
-                return m_IsPortTurnAllowed;
-            }
-        }
+        public double TurnRadiusForPort { get; private set; }
 
-        public bool IsStarboardTurnAllowed
-        {
-            get
-            {
-                return m_IsStarboardTurnAllowed;
-            }
-        }
+        public bool IsPortTurnAllowed { get; private set; }
+
+        public bool IsStarboardTurnAllowed { get; private set; }
     }
 }

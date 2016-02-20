@@ -3,6 +3,7 @@ using Castle.Core;
 using JetBrains.Annotations;
 using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
+using Selkie.Geometry.Primitives;
 using Selkie.Racetrack;
 using Selkie.Racetrack.Calculators;
 using Selkie.Services.Common.Dto;
@@ -84,7 +85,8 @@ namespace Selkie.Services.Racetracks
 
             m_RacetracksCalculator = m_Factory.Create <IRacetracksCalculator>();
             m_RacetracksCalculator.Lines = m_LinesSourceManager.Lines;
-            m_RacetracksCalculator.Radius = source.TurnRadius;
+            m_RacetracksCalculator.TurnRadiusForPort = new Distance(source.TurnRadiusForPort);
+            m_RacetracksCalculator.TurnRadiusForStarboard = new Distance(source.TurnRadiusForStarboard);
             m_RacetracksCalculator.IsPortTurnAllowed = source.IsPortTurnAllowed;
             m_RacetracksCalculator.IsStarboardTurnAllowed = source.IsStarboardTurnAllowed;
             m_RacetracksCalculator.Calculate();
@@ -94,12 +96,13 @@ namespace Selkie.Services.Racetracks
 
         private void LogRacetrackSettings([NotNull] IRacetrackSettingsSource source)
         {
-            string text = "[RacetracksSourceManager] " +
-                          "Racetrack Settings: TurnRadius = {0} " +
-                          "IsPortTurnAllowed = {1} " +
-                          "IsStarboardTurnAllowed = {2}";
+            const string text = "[RacetracksSourceManager] " +
+                                "Racetrack Settings: TurnRadius = {0} " +
+                                "IsPortTurnAllowed = {1} " +
+                                "IsStarboardTurnAllowed = {2}";
 
-            m_Logger.Info(text.Inject(source.TurnRadius,
+            m_Logger.Info(text.Inject(source.TurnRadiusForPort,
+                                      source.TurnRadiusForStarboard,
                                       source.IsPortTurnAllowed,
                                       source.IsStarboardTurnAllowed));
         }

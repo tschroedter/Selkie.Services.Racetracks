@@ -1,14 +1,10 @@
-﻿using JetBrains.Annotations;
-using Selkie.Geometry.Primitives;
-
-namespace Selkie.Services.Racetracks
+﻿namespace Selkie.Services.Racetracks
 {
     public interface IRacetrackSettingsSource
     {
-        [NotNull]
-        Distance TurnRadius { get; }
-
         bool IsPortTurnAllowed { get; }
         bool IsStarboardTurnAllowed { get; }
+        double TurnRadiusForStarboard { get; }
+        double TurnRadiusForPort { get; }
     }
 }

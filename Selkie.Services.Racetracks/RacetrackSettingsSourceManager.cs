@@ -3,7 +3,6 @@ using Castle.Core;
 using JetBrains.Annotations;
 using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
-using Selkie.Geometry.Primitives;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor;
 using Selkie.Windsor.Extensions;
@@ -54,18 +53,26 @@ namespace Selkie.Services.Racetracks
             m_Logger.Info("Stopped '{0}'!".Inject(GetType().FullName));
         }
 
-        internal void RacetrackSettingsGetHandler(RacetrackSettingsGetMessage obj)
+        internal void RacetrackSettingsGetHandler([NotNull] RacetrackSettingsGetMessage message)
         {
             SendRacetrackSettingsChangedMessage(m_Source);
         }
 
         internal void RacetrackSettingsSetHandler([NotNull] RacetrackSettingsSetMessage message)
         {
-            double turnRadiusInMetres = message.TurnRadiusInMetres;
-
-            if ( message.TurnRadiusInMetres <= 0.0 )
+            if ( message.TurnRadiusForPort <= 0.0 )
             {
-                string text = "Turn radius in meters is '{0}' but it can't be 0 or negative!".Inject(turnRadiusInMetres);
+                string text = "Turn radius for port turn in meters is '{0}' " +
+                              "but it can't be 0 or negative!".Inject(message.TurnRadiusForPort);
+
+                throw new ArgumentException(text,
+                                            "message");
+            }
+
+            if ( message.TurnRadiusForStarboard <= 0.0 )
+            {
+                string text = "Turn radius for starboard turn in meters is '{0}' " +
+                              "but it can't be 0 or negative!".Inject(message.TurnRadiusForStarboard);
 
                 throw new ArgumentException(text,
                                             "message");
@@ -76,9 +83,8 @@ namespace Selkie.Services.Racetracks
 
         private void HandleValidRacetrackSettingsMessage([NotNull] RacetrackSettingsSetMessage message)
         {
-            var turnRadius = new Distance(message.TurnRadiusInMetres);
-
-            m_Source = new RacetrackSettingsSource(turnRadius,
+            m_Source = new RacetrackSettingsSource(message.TurnRadiusForPort,
+                                                   message.TurnRadiusForStarboard,
                                                    message.IsPortTurnAllowed,
                                                    message.IsStarboardTurnAllowed);
 
@@ -91,7 +97,8 @@ namespace Selkie.Services.Racetracks
         {
             m_Bus.PublishAsync(new RacetrackSettingsChangedMessage
                                {
-                                   TurnRadiusInMetres = source.TurnRadius.Length,
+                                   TurnRadiusForPort = source.TurnRadiusForPort,
+                                   TurnRadiusForStarboard = source.TurnRadiusForStarboard,
                                    IsPortTurnAllowed = source.IsPortTurnAllowed,
                                    IsStarboardTurnAllowed = source.IsStarboardTurnAllowed
                                });
@@ -99,12 +106,14 @@ namespace Selkie.Services.Racetracks
 
         private void LogRacetrackSettings([NotNull] IRacetrackSettingsSource source)
         {
-            string text = "[RacetrackSettingsSourceManager] " +
-                          "Racetrack Settings: TurnRadius = {0} " +
-                          "IsPortTurnAllowed = {1} " +
-                          "IsStarboardTurnAllowed = {2}";
+            const string text = "[RacetrackSettingsSourceManager] " +
+                                "Racetrack Settings: TurnRadiusForPort = {0} " +
+                                "TurnRadiusForStarboard = {1} " +
+                                "IsPortTurnAllowed = {2} " +
+                                "IsStarboardTurnAllowed = {3}";
 
-            m_Logger.Info(text.Inject(source.TurnRadius,
+            m_Logger.Info(text.Inject(source.TurnRadiusForPort,
+                                      source.TurnRadiusForStarboard,
                                       source.IsPortTurnAllowed,
                                       source.IsStarboardTurnAllowed));
         }

@@ -74,7 +74,6 @@ namespace Selkie.Services.Racetracks.Console.Client
             WaitForLinesChangedMessage();
             SendRacetrackSettingsSetMessage();
             WaitForRacetrackSettingsChangedMessage();
-            WaitForRacetracksChangedMessage();
             SendCostMatrixCalculateMessage();
             WaitForCostMatrixChangedMessage();
             SendRacetracksGetMessage();
@@ -87,7 +86,8 @@ namespace Selkie.Services.Racetracks.Console.Client
 
             var message = new RacetrackSettingsSetMessage
                           {
-                              TurnRadiusInMetres = 100.0,
+                              TurnRadiusForPort = 100.0,
+                              TurnRadiusForStarboard = 200.0,
                               IsPortTurnAllowed = true,
                               IsStarboardTurnAllowed = true
                           };
@@ -172,7 +172,7 @@ namespace Selkie.Services.Racetracks.Console.Client
             SleepWaitAndDo(() => m_IsReceivedRacetracksChangedMessage,
                            DoNothing);
 
-            if ( !m_IsReceivedCostMatrixChangedMessage )
+            if ( !m_IsReceivedRacetracksChangedMessage )
             {
                 throw new Exception("Did not receive RacetracksChangedMessage!");
             }
@@ -182,8 +182,8 @@ namespace Selkie.Services.Racetracks.Console.Client
                 throw new Exception("Did not receive Racetracks!");
             }
 
-            m_SelkieConsole.WriteLine(
-                                      "Received RacetracksChangedMessage! - ForwardToForward: {0} ForwardToReverse: {1} ReverseToForward: {2} ReverseToReverse: {3}"
+            m_SelkieConsole.WriteLine("Received RacetracksChangedMessage! - ForwardToForward: {0} " +
+                                      "ForwardToReverse: {1} ReverseToForward: {2} ReverseToReverse: {3}"
                                           .Inject(m_Racetracks.ForwardToForward.Length,
                                                   m_Racetracks.ForwardToReverse.Length,
                                                   m_Racetracks.ReverseToForward.Length,

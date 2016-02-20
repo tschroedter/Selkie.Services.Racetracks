@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
 using NUnit.Framework;
 using Selkie.EasyNetQ;
-using Selkie.Geometry.Primitives;
+using Selkie.NUnit.Extensions;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Windsor;
 
@@ -47,10 +47,10 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         [Test]
         public void RacetrackSettingsSetHandlerCreatesNewSourceTest()
         {
-            var turnRadius = new Distance(100.0);
             var message = new RacetrackSettingsSetMessage
                           {
-                              TurnRadiusInMetres = turnRadius.Length,
+                              TurnRadiusForPort = 100.0,
+                              TurnRadiusForStarboard = 200.0,
                               IsPortTurnAllowed = true,
                               IsStarboardTurnAllowed = true
                           };
@@ -59,8 +59,8 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
 
             IRacetrackSettingsSource actual = m_Manager.Source;
 
-            Assert.AreEqual(turnRadius,
-                            actual.TurnRadius);
+            NUnitHelper.AssertIsEquivalent(100.0,
+                                           actual.TurnRadiusForPort);
         }
 
         [Test]
@@ -68,7 +68,8 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         {
             var message = new RacetrackSettingsSetMessage
                           {
-                              TurnRadiusInMetres = 100.0,
+                              TurnRadiusForPort = 100.0,
+                              TurnRadiusForStarboard = 200.0,
                               IsPortTurnAllowed = true,
                               IsStarboardTurnAllowed = true
                           };
@@ -79,12 +80,12 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusInMetresIsNegativeTest()
+        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusForPortIsNegativeTest()
         {
-            var turnRadius = new Distance(-1.0);
             var message = new RacetrackSettingsSetMessage
                           {
-                              TurnRadiusInMetres = turnRadius.Length,
+                              TurnRadiusForPort = -1.0,
+                              TurnRadiusForStarboard = 1.0,
                               IsPortTurnAllowed = true,
                               IsStarboardTurnAllowed = true
                           };
@@ -93,12 +94,40 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusInMetresIsZeroTest()
+        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusForPortIsZeroTest()
         {
-            var turnRadius = new Distance(0.0);
             var message = new RacetrackSettingsSetMessage
                           {
-                              TurnRadiusInMetres = turnRadius.Length,
+                              TurnRadiusForPort = 0.0,
+                              TurnRadiusForStarboard = 1.0,
+                              IsPortTurnAllowed = true,
+                              IsStarboardTurnAllowed = true
+                          };
+
+            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetHandler(message));
+        }
+
+        [Test]
+        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusForStarboardIsNegativeTest()
+        {
+            var message = new RacetrackSettingsSetMessage
+                          {
+                              TurnRadiusForPort = 1.0,
+                              TurnRadiusForStarboard = -1.0,
+                              IsPortTurnAllowed = true,
+                              IsStarboardTurnAllowed = true
+                          };
+
+            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetHandler(message));
+        }
+
+        [Test]
+        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusForStarboardIsZeroTest()
+        {
+            var message = new RacetrackSettingsSetMessage
+                          {
+                              TurnRadiusForPort = 1.0,
+                              TurnRadiusForStarboard = 0.0,
                               IsPortTurnAllowed = true,
                               IsStarboardTurnAllowed = true
                           };
@@ -110,7 +139,8 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         public void SendRacetrackSettingsChangedMessageSendsMessageTest()
         {
             var source = Substitute.For <IRacetrackSettingsSource>();
-            source.TurnRadius.Returns(new Distance(1.0));
+            source.TurnRadiusForPort.Returns(1.0);
+            source.TurnRadiusForStarboard.Returns(2.0);
             source.IsPortTurnAllowed.Returns(true);
             source.IsStarboardTurnAllowed.Returns(true);
 
@@ -120,7 +150,10 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
                  .PublishAsync(
                                Arg.Is <RacetrackSettingsChangedMessage>(
                                                                         x =>
-                                                                        Math.Abs(x.TurnRadiusInMetres - 1.0) < 0.1 &&
+                                                                        Math.Abs(x.TurnRadiusForPort - 1.0) <
+                                                                        0.1 &&
+                                                                        Math.Abs(x.TurnRadiusForStarboard - 2.0) <
+                                                                        0.1 &&
                                                                         x.IsPortTurnAllowed &&
                                                                         x.IsStarboardTurnAllowed));
         }

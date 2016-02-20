@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
 using NUnit.Framework;
 using Selkie.EasyNetQ;
-using Selkie.Geometry.Primitives;
 using Selkie.Geometry.Shapes;
 using Selkie.Racetrack;
 using Selkie.Racetrack.Calculators;
@@ -30,7 +29,8 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
             m_Converter.ConvertPaths(null).ReturnsForAnyArgs(m_RacetracksDto);
 
             m_RacetrackSettingsSource = Substitute.For <IRacetrackSettingsSource>();
-            m_RacetrackSettingsSource.TurnRadius.Returns(new Distance(30.0));
+            m_RacetrackSettingsSource.TurnRadiusForPort.Returns(30.0);
+            m_RacetrackSettingsSource.TurnRadiusForStarboard.Returns(30.0);
 
             m_Lines = new ILine[]
                       {
@@ -125,12 +125,21 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void CalculateSetsRadiusTest()
+        public void CalculateSetsTurnRadiusForPortTest()
         {
             m_Manager.Update();
 
-            Assert.AreEqual(m_RacetrackSettingsSourceManager.Source.TurnRadius,
-                            m_RacetracksCalculator.Radius);
+            Assert.AreEqual(m_RacetrackSettingsSourceManager.Source.TurnRadiusForPort,
+                            m_RacetracksCalculator.TurnRadiusForPort.Length);
+        }
+
+        [Test]
+        public void CalculateSetsTurnRadiusForStarboardTest()
+        {
+            m_Manager.Update();
+
+            Assert.AreEqual(m_RacetrackSettingsSourceManager.Source.TurnRadiusForStarboard,
+                            m_RacetracksCalculator.TurnRadiusForStarboard.Length);
         }
 
         [Test]

@@ -11,7 +11,8 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps
         {
             var message = new RacetrackSettingsSetMessage
                           {
-                              TurnRadiusInMetres = 100.0,
+                              TurnRadiusForPort = 100.0,
+                              TurnRadiusForStarboard = 200.0,
                               IsPortTurnAllowed = true,
                               IsStarboardTurnAllowed = true
                           };
