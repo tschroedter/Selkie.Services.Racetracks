@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Selkie.Services.Racetracks", "Selkie.Services.Racetracks\Selkie.Services.Racetracks.csproj", "{7360588E-E5E6-4955-A1A4-519D9B373CE7}"
 EndProject
@@ -19,6 +19,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Selkie.Services.Racetracks.Console.Client", "Selkie.Services.Racetracks.Console.Client\Selkie.Services.Racetracks.Console.Client.csproj", "{7D43DC52-548E-4806-A973-CE4EF9EE293D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NuGet.Selkie.Services.Racetracks", "NuGet.Selkie.Services.Racetracks\NuGet.Selkie.Services.Racetracks.csproj", "{0451BAEF-DF2E-4B98-8644-94EE9415E389}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Selkie.Services.Racetracks.Windows.Service", "Selkie.Services.Racetracks.Windows.Service\Selkie.Services.Racetracks.Windows.Service.csproj", "{14BAFE38-1968-4EEF-ADB6-E434EFB18895}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Selkie.Services.Racetracks.Windows.Service.Setup", "Selkie.Services.Racetracks.Windows.Service.Setup\Selkie.Services.Racetracks.Windows.Service.Setup.vdproj", "{9F401FD3-F408-4022-A7D1-5A6CC40B62A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +54,12 @@ Global
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0451BAEF-DF2E-4B98-8644-94EE9415E389}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14BAFE38-1968-4EEF-ADB6-E434EFB18895}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14BAFE38-1968-4EEF-ADB6-E434EFB18895}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14BAFE38-1968-4EEF-ADB6-E434EFB18895}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14BAFE38-1968-4EEF-ADB6-E434EFB18895}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F401FD3-F408-4022-A7D1-5A6CC40B62A3}.Debug|Any CPU.ActiveCfg = Debug
+		{9F401FD3-F408-4022-A7D1-5A6CC40B62A3}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
