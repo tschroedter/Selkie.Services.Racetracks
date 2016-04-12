@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Castle.Core;
 using JetBrains.Annotations;
 using Selkie.Aop.Aspects;
@@ -91,12 +92,39 @@ namespace Selkie.Services.Racetracks
         {
             LineDto[] arrayDtos = lineDtos.ToArray();
 
+            m_Logger.Info("Trying to update to the following lines:\r\n{0}".Inject(DtosToString(arrayDtos)));
+
             if ( m_Validator.ValidateDtos(arrayDtos) )
             {
                 IEnumerable <ILine> lines = arrayDtos.Select(LineToLineDtoConverter.ConvertToLine);
 
                 m_Lines = lines.ToArray();
+
+                m_Logger.Info("Lines are updated!"); // todo test
             }
+            else
+            {
+                m_Logger.Error("Sorry, could not update lines because they are invalid!"); // todo test
+            }
+        }
+
+        private string DtosToString(LineDto[] arrayDtos)
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach ( LineDto dto in arrayDtos )
+            {
+                var text = "[Id {0}] ".Inject(dto.Id) +
+                           "IsUnknown {0} ".Inject(dto.IsUnknown) +
+                           "RunDirection {0} ".Inject(dto.RunDirection) +
+                           "X1 {0} ".Inject(dto.X1) +
+                           "Y1 {0} ".Inject(dto.X2) +
+                           "X2 {0} ".Inject(dto.Y1) +
+                           "Y2 {0} ".Inject(dto.Y2);
+
+                builder.AppendLine(text);
+            }
+            return builder.ToString();
         }
     }
 }

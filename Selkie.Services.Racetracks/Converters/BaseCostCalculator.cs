@@ -81,9 +81,21 @@ namespace Selkie.Services.Racetracks.Converters
         [NotNull]
         private Dictionary <int, double> CalculateCost()
         {
-            var costs = new Dictionary <int, double>();
+            if ( m_Racetracks.ForwardToForward.Length == 0 )
+            {
+                m_Logger.Error("Racetracks is not set!"); // todo testing
 
-            foreach ( ILine otherLine in Lines )
+                return new Dictionary <int, double>();
+            }
+
+            return CalcuateCostForLines();
+        }
+
+        private Dictionary <int, double> CalcuateCostForLines()
+        {
+            var costs = new Dictionary<int, double>();
+
+            foreach (ILine otherLine in Lines)
             {
                 double cost = CostMatrix.CostToMyself;
 
@@ -108,8 +120,9 @@ namespace Selkie.Services.Racetracks.Converters
         {
             if ( !IsValidLineId(fromLineId) )
             {
-                string message = "fromLineId = {0} paths[{1}][]".Inject(fromLineId,
-                                                                        m_Racetracks.ForwardToForward.Length);
+                string message = "Invalid line id! - fromLineId = {0} paths[{1}][]".Inject(fromLineId,
+                                                                                           m_Racetracks.ForwardToForward
+                                                                                                       .Length);
                 m_Logger.Warn(message);
 
                 return 0.0;
