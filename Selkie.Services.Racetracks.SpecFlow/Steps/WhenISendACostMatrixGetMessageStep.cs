@@ -4,12 +4,12 @@ using TechTalk.SpecFlow;
 
 namespace Selkie.Services.Racetracks.SpecFlow.Steps
 {
-    public class WhenISendACostMatrixGetMessageStep : BaseStep
+    public class WhenISendACostMatrixRequestMessageStep : BaseStep
     {
-        [When(@"I send a CostMatrixGetMessage")]
+        [When(@"I send a CostMatrixRequestMessage")]
         public override void Do()
         {
-            Bus.PublishAsync(new CostMatrixGetMessage());
+            Bus.PublishAsync(new CostMatrixRequestMessage());
         }
     }
 }

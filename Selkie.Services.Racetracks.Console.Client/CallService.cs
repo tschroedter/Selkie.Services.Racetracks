@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using JetBrains.Annotations;
@@ -20,10 +18,9 @@ namespace Selkie.Services.Racetracks.Console.Client
         private static readonly TimeSpan SleepTime = TimeSpan.FromSeconds(1.0);
         private readonly ISelkieBus m_Bus;
         private readonly ISelkieConsole m_SelkieConsole;
-        private bool m_IsReceivedCostMatrixChangedMessage;
-        private bool m_IsReceivedLinesChangedMessage;
-        private bool m_IsReceivedRacetracksChangedMessage;
-        private bool m_IsReceivedRacetrackSettingsChangedMessage;
+        private bool m_IsReceivedCostMatrixResponseMessage;
+        private bool m_IsReceivedRacetrackSettingsResponseMessage;
+        private bool m_IsReceivedRacetracksResponseMessage;
         private double[][] m_Matrix;
         private RacetracksDto m_Racetracks;
 
@@ -33,130 +30,78 @@ namespace Selkie.Services.Racetracks.Console.Client
             m_Bus = bus;
             m_SelkieConsole = selkieConsole;
 
-            m_Bus.SubscribeAsync <LinesChangedMessage>(GetType().FullName,
-                                                       LinesChangedHandler);
+            m_Bus.SubscribeAsync <CostMatrixResponseMessage>(GetType().FullName,
+                                                             CostMatrixResponseHandler);
 
-            m_Bus.SubscribeAsync <RacetrackSettingsChangedMessage>(GetType().FullName,
-                                                                   RacetrackSettingsChangedHandler);
-
-            m_Bus.SubscribeAsync <CostMatrixChangedMessage>(GetType().FullName,
-                                                            CostMatrixChangedHandler);
-
-            m_Bus.SubscribeAsync <RacetracksChangedMessage>(GetType().FullName,
-                                                            RacetracksChangedHandler);
+            m_Bus.SubscribeAsync <RacetracksResponseMessage>(GetType().FullName,
+                                                             RacetracksResponseHandler);
         }
 
-        private void RacetracksChangedHandler(RacetracksChangedMessage message)
+        private void RacetracksResponseHandler(RacetracksResponseMessage message)
         {
-            m_IsReceivedRacetracksChangedMessage = true;
+            m_IsReceivedRacetracksResponseMessage = true;
             m_Racetracks = message.Racetracks;
         }
 
-        private void LinesChangedHandler([NotNull] LinesChangedMessage message)
+        private void CostMatrixResponseHandler([NotNull] CostMatrixResponseMessage message)
         {
-            m_IsReceivedLinesChangedMessage = true;
-        }
-
-        private void CostMatrixChangedHandler([NotNull] CostMatrixChangedMessage message)
-        {
-            m_IsReceivedCostMatrixChangedMessage = true;
+            m_IsReceivedCostMatrixResponseMessage = true;
             m_Matrix = message.Matrix;
-        }
-
-        private void RacetrackSettingsChangedHandler([NotNull] RacetrackSettingsChangedMessage message)
-        {
-            m_IsReceivedRacetrackSettingsChangedMessage = true;
         }
 
         public void Do()
         {
-            SendLinesSetMessage();
-            WaitForLinesChangedMessage();
-            SendRacetrackSettingsSetMessage();
-            WaitForRacetrackSettingsChangedMessage();
             SendCostMatrixCalculateMessage();
-            WaitForCostMatrixChangedMessage();
+            WaitForCostMatrixResponseMessage();
             SendRacetracksGetMessage();
-            WaitForRacetracksChangedMessage();
+            WaitForRacetracksResponseMessage();
         }
 
-        public void SendRacetrackSettingsSetMessage()
+        public void WaitForRacetrackSettingsResponseMessage()
         {
-            m_SelkieConsole.WriteLine("Sending RacetrackSettingsSetMessage!");
-
-            var message = new RacetrackSettingsSetMessage
-                          {
-                              TurnRadiusForPort = 100.0,
-                              TurnRadiusForStarboard = 200.0,
-                              IsPortTurnAllowed = true,
-                              IsStarboardTurnAllowed = true
-                          };
-
-            m_Bus.PublishAsync(message);
-        }
-
-        public void WaitForRacetrackSettingsChangedMessage()
-        {
-            m_IsReceivedRacetrackSettingsChangedMessage = false;
-            SleepWaitAndDo(() => m_IsReceivedRacetrackSettingsChangedMessage,
+            m_IsReceivedRacetrackSettingsResponseMessage = false;
+            SleepWaitAndDo(() => m_IsReceivedRacetrackSettingsResponseMessage,
                            DoNothing);
 
-            if ( !m_IsReceivedRacetrackSettingsChangedMessage )
+            if ( !m_IsReceivedRacetrackSettingsResponseMessage )
             {
-                throw new Exception("Did not receive RacetrackSettingsChangedMessage!");
+                throw new Exception("Did not receive RacetrackSettingsResponseMessage!");
             }
 
-            m_SelkieConsole.WriteLine("Received RacetrackSettingsChangedMessage!");
-        }
-
-        public void SendLinesSetMessage()
-        {
-            m_SelkieConsole.WriteLine("Sending LinesSetMessage!");
-
-            IEnumerable <LineDto> dtos = CreateLineDtos();
-            var linesSetMessage = new LinesSetMessage
-                                  {
-                                      LineDtos = dtos.ToArray()
-                                  };
-
-            m_Bus.PublishAsync(linesSetMessage);
-        }
-
-        public void WaitForLinesChangedMessage()
-        {
-            SleepWaitAndDo(() => m_IsReceivedLinesChangedMessage,
-                           DoNothing);
-
-            if ( !m_IsReceivedLinesChangedMessage )
-            {
-                throw new Exception("Did not receive LinesChangedMessage!");
-            }
-
-            m_SelkieConsole.WriteLine("Received LinesChangedMessage!");
+            m_SelkieConsole.WriteLine("Received RacetrackSettingsResponseMessage!");
         }
 
         public void SendCostMatrixCalculateMessage()
         {
             m_SelkieConsole.WriteLine("Sending CostMatrixCalculateMessage!");
 
-            m_Bus.PublishAsync(new CostMatrixCalculateMessage());
+            var message = new CostMatrixCalculateMessage
+                          {
+                              LineDtos = CreateLineDtos(),
+                              IsPortTurnAllowed = true,
+                              IsStarboardTurnAllowed = true,
+                              TurnRadiusForPort = 100.0,
+                              TurnRadiusForStarboard = 100.0
+                          };
+
+            m_Bus.PublishAsync(message);
         }
 
-        public void WaitForCostMatrixChangedMessage()
+        public void WaitForCostMatrixResponseMessage()
         {
-            SleepWaitAndDo(() => m_IsReceivedCostMatrixChangedMessage,
+            SleepWaitAndDo(() => m_IsReceivedCostMatrixResponseMessage,
                            DoNothing);
 
-            if ( !m_IsReceivedCostMatrixChangedMessage )
+            if ( !m_IsReceivedCostMatrixResponseMessage )
             {
-                throw new Exception("Did not receive CostMatrixChangedMessage!");
+                throw new Exception("Did not receive CostMatrixResponseMessage!");
             }
 
             m_SelkieConsole.WriteLine(
-                                      "Received CostMatrixChangedMessage! - m_Matrix.GetLength(0): {0}".Inject(
-                                                                                                               m_Matrix
-                                                                                                                   .GetLength
-                                                                                                                   (0)));
+                                      "Received CostMatrixResponseMessage! - m_Matrix.GetLength(0): {0}".Inject(
+                                                                                                                m_Matrix
+                                                                                                                    .GetLength
+                                                                                                                    (0)));
             m_SelkieConsole.WriteLine(CostMatrixToString(m_Matrix));
         }
 
@@ -167,14 +112,14 @@ namespace Selkie.Services.Racetracks.Console.Client
             m_Bus.PublishAsync(new RacetracksGetMessage());
         }
 
-        public void WaitForRacetracksChangedMessage()
+        public void WaitForRacetracksResponseMessage()
         {
-            SleepWaitAndDo(() => m_IsReceivedRacetracksChangedMessage,
+            SleepWaitAndDo(() => m_IsReceivedRacetracksResponseMessage,
                            DoNothing);
 
-            if ( !m_IsReceivedRacetracksChangedMessage )
+            if ( !m_IsReceivedRacetracksResponseMessage )
             {
-                throw new Exception("Did not receive RacetracksChangedMessage!");
+                throw new Exception("Did not receive RacetracksResponseMessage!");
             }
 
             if ( m_Racetracks == null )
@@ -182,7 +127,7 @@ namespace Selkie.Services.Racetracks.Console.Client
                 throw new Exception("Did not receive Racetracks!");
             }
 
-            m_SelkieConsole.WriteLine("Received RacetracksChangedMessage! - ForwardToForward: {0} " +
+            m_SelkieConsole.WriteLine("Received RacetracksResponseMessage! - ForwardToForward: {0} " +
                                       "ForwardToReverse: {1} ReverseToForward: {2} ReverseToReverse: {3}"
                                           .Inject(m_Racetracks.ForwardToForward.Length,
                                                   m_Racetracks.ForwardToReverse.Length,
@@ -192,7 +137,7 @@ namespace Selkie.Services.Racetracks.Console.Client
         }
 
         [NotNull]
-        private IEnumerable <LineDto> CreateLineDtos()
+        private LineDto[] CreateLineDtos()
         {
             var lineOne = new LineDto
                           {

@@ -5,8 +5,9 @@ using Castle.Core;
 using JetBrains.Annotations;
 using Selkie.Aop.Aspects;
 using Selkie.Geometry.Shapes;
-using Selkie.Racetrack;
-using Selkie.Services.Racetracks.Converters;
+using Selkie.Racetrack.Interfaces;
+using Selkie.Services.Racetracks.Interfaces;
+using Selkie.Services.Racetracks.Interfaces.Converters;
 using Selkie.Services.Racetracks.TypedFactories;
 using Selkie.Windsor;
 using Selkie.Windsor.Extensions;
@@ -21,6 +22,7 @@ namespace Selkie.Services.Racetracks
         public static readonly double CostToMyself = 0.0;
         private readonly IConverterFactory m_ConverterFactory;
         private readonly ILinesSourceManager m_LinesSourceManager;
+        private readonly ISelkieLogger m_Logger;
         private readonly IRacetracksSourceManager m_RacetracksSourceManager;
         private ILine[] m_Lines = new ILine[0];
         private double[][] m_Matrix = new double[0][];
@@ -35,6 +37,7 @@ namespace Selkie.Services.Racetracks
                           [NotNull] IRacetracksSourceManager racetracksSourceManager,
                           [NotNull] IConverterFactory converterFactory)
         {
+            m_Logger = logger;
             m_LinesSourceManager = linesSourceManager;
             m_RacetracksSourceManager = racetracksSourceManager;
             m_ConverterFactory = converterFactory;
@@ -70,9 +73,14 @@ namespace Selkie.Services.Racetracks
 
         public void Initialize()
         {
-            IEnumerable <ILine> sourceLines = m_LinesSourceManager.Lines;
+            // todo move into calculate method
+            IEnumerable <ILine> sourceLines = m_LinesSourceManager.Lines.ToArray();
+
+            m_Logger.Debug(LinesToString(sourceLines));
+
             m_Lines = sourceLines.ToArray();
             m_Matrix = CreateMatrix(m_Lines);
+
             m_Racetracks = m_RacetracksSourceManager.Racetracks;
         }
 
@@ -216,6 +224,22 @@ namespace Selkie.Services.Racetracks
                 }
 
                 builder.AppendLine();
+            }
+
+            return builder.ToString();
+        }
+
+        private string LinesToString([NotNull] IEnumerable <ILine> lines)
+        {
+            // todo testing
+            IEnumerable <ILine> enumerable = lines as ILine[] ?? lines.ToArray();
+
+            var builder = new StringBuilder();
+            builder.AppendLine("Line count: {0}".Inject(enumerable.Count()));
+
+            foreach ( ILine line in enumerable )
+            {
+                builder.AppendLine(line.ToString());
             }
 
             return builder.ToString();

@@ -31,11 +31,11 @@ namespace Selkie.Services.Racetracks.Windows.Service
         private void serviceProcessInstaller1_AfterInstall(object sender,
                                                            InstallEventArgs e)
         {
-            string path = Context.Parameters["assemblypath"];
+            string path = Context.Parameters [ "assemblypath" ];
             string myAssembly = Path.GetFullPath(path);
             string directoryName = Path.GetDirectoryName(myAssembly);
 
-            if (directoryName == null)
+            if ( directoryName == null )
             {
                 throw new NullReferenceException("Could not get directory name for path '{0}'!".Inject(path));
             }

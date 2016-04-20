@@ -1,5 +1,5 @@
 ﻿using JetBrains.Annotations;
-using Selkie.Services.Racetracks.Converters;
+using Selkie.Services.Racetracks.Interfaces.Converters;
 using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks.TypedFactories

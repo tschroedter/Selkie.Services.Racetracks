@@ -1,7 +1,8 @@
 using JetBrains.Annotations;
 using Selkie.Geometry.Shapes;
-using Selkie.Racetrack;
+using Selkie.Racetrack.Interfaces;
 using Selkie.Services.Common.Dto;
+using Selkie.Services.Racetracks.Interfaces.Converters.Dtos;
 
 namespace Selkie.Services.Racetracks.Converters.Dtos
 {

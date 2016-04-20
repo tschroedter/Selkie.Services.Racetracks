@@ -3,12 +3,12 @@ using TechTalk.SpecFlow;
 
 namespace Selkie.Services.Racetracks.SpecFlow.Steps
 {
-    public class GivenDidNotReceiveRacetracksChangedMessage : BaseStep
+    public class GivenDidNotReceiveRacetracksResponseMessage : BaseStep
     {
-        [Given(@"Did not receive RacetracksChangedMessage")]
+        [Given(@"Did not receive RacetracksResponseMessage")]
         public override void Do()
         {
-            ScenarioContext.Current [ "IsReceivedRacetracksChangedMessage" ] = false;
+            ScenarioContext.Current [ "IsReceivedRacetracksResponseMessage" ] = false;
         }
     }
 }

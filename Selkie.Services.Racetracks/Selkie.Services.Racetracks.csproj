@@ -65,7 +65,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NLog, Version=4.1.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
@@ -76,40 +76,40 @@
       <HintPath>..\packages\RabbitMQ.Client.3.5.4\lib\net40\RabbitMQ.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Aop, Version=0.6.19.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Aop.0.6.19.0\lib\net45\Selkie.Aop.dll</HintPath>
+    <Reference Include="Selkie.Aop, Version=0.6.31.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Aop.0.6.31.0\lib\net45\Selkie.Aop.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Common, Version=0.6.228.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Common.0.6.228.0\lib\net45\Selkie.Common.dll</HintPath>
+    <Reference Include="Selkie.Common, Version=0.6.232.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Common.0.6.232.0\lib\net45\Selkie.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.EasyNetQ, Version=0.6.214.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.EasyNetQ.0.6.214.0\lib\net45\Selkie.EasyNetQ.dll</HintPath>
+    <Reference Include="Selkie.EasyNetQ, Version=0.6.220.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.EasyNetQ.0.6.220.0\lib\net45\Selkie.EasyNetQ.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Geometry, Version=0.6.137.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Geometry.0.6.137.0\lib\net45\Selkie.Geometry.dll</HintPath>
+    <Reference Include="Selkie.Geometry, Version=0.6.141.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Geometry.0.6.141.0\lib\net45\Selkie.Geometry.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Racetrack, Version=0.6.153.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Racetrack.0.6.153.0\lib\net45\Selkie.Racetrack.dll</HintPath>
+    <Reference Include="Selkie.Racetrack, Version=0.6.157.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Racetrack.0.6.157.0\lib\net45\Selkie.Racetrack.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Services.Common, Version=0.6.174.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Services.Common.0.6.174.0\lib\net45\Selkie.Services.Common.dll</HintPath>
+    <Reference Include="Selkie.Services.Common, Version=0.6.187.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Services.Common.0.6.187.0\lib\net45\Selkie.Services.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Selkie.Services.Common.Dto, Version=0.6.17.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Selkie.Services.Common.Dto.0.6.17.0\lib\net45\Selkie.Services.Common.Dto.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Services.Racetracks.Common, Version=0.6.66.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Services.Racetracks.Common.0.6.66.0\lib\net45\Selkie.Services.Racetracks.Common.dll</HintPath>
+    <Reference Include="Selkie.Services.Racetracks.Common, Version=0.6.72.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Services.Racetracks.Common.0.6.72.0\lib\net45\Selkie.Services.Racetracks.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Windsor, Version=0.6.256.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Windsor.0.6.256.0\lib\net45\Selkie.Windsor.dll</HintPath>
+    <Reference Include="Selkie.Windsor, Version=0.6.257.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Windsor.0.6.257.0\lib\net45\Selkie.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -127,43 +127,44 @@
     <Compile Include="Converters\CostStartToStartCalculator.cs" />
     <Compile Include="Converters\Dtos\ArcSegmentToArcSegmentDtoConverter.cs" />
     <Compile Include="Converters\Dtos\CircleToCircleDtoConverter.cs" />
-    <Compile Include="Converters\Dtos\IArcSegmentToArcSergmentDtoConverter.cs" />
-    <Compile Include="Converters\Dtos\ICircleToCircleDtoConverter.cs" />
-    <Compile Include="Converters\Dtos\ILineToLineSegmentDtoConverter.cs" />
-    <Compile Include="Converters\Dtos\IPathToPathDtoConverter.cs" />
-    <Compile Include="Converters\Dtos\IPointToPointDtoConverter.cs" />
-    <Compile Include="Converters\Dtos\IPolylineToPolylineDtoConverter.cs" />
-    <Compile Include="Converters\Dtos\ISegmentToSegmentDtoConverter.cs" />
+    <Compile Include="Interfaces\Converters\Dtos\IArcSegmentToArcSergmentDtoConverter.cs" />
+    <Compile Include="Interfaces\Converters\Dtos\ICircleToCircleDtoConverter.cs" />
+    <Compile Include="Interfaces\Converters\Dtos\ILineToLineSegmentDtoConverter.cs" />
+    <Compile Include="Interfaces\Converters\Dtos\IPathToPathDtoConverter.cs" />
+    <Compile Include="Interfaces\Converters\Dtos\IPointToPointDtoConverter.cs" />
+    <Compile Include="Interfaces\Converters\Dtos\IPolylineToPolylineDtoConverter.cs" />
+    <Compile Include="Interfaces\Converters\Dtos\ISegmentToSegmentDtoConverter.cs" />
     <Compile Include="Converters\Dtos\LineToLineSegmentDtoConverter.cs" />
     <Compile Include="Converters\Dtos\PathToPathDtoConverter.cs" />
     <Compile Include="Converters\Dtos\PointToPointDtoConverter.cs" />
     <Compile Include="Converters\Dtos\PolylineToPolylineDtoConverter.cs" />
     <Compile Include="Converters\Dtos\SegmentToSegmentDtoConverter.cs" />
-    <Compile Include="Converters\IBaseCostCalculator.cs" />
-    <Compile Include="Converters\IConverter.cs" />
-    <Compile Include="Converters\ICostEndToEndCalculator.cs" />
-    <Compile Include="Converters\ICostEndToStartCalculator.cs" />
-    <Compile Include="Converters\ICostStartToEndCalculator.cs" />
-    <Compile Include="Converters\ICostStartToStartCalculator.cs" />
-    <Compile Include="Converters\ILineToLinesConverter.cs" />
+    <Compile Include="Interfaces\Converters\IBaseCostCalculator.cs" />
+    <Compile Include="Interfaces\Converters\IConverter.cs" />
+    <Compile Include="Interfaces\Converters\ICostEndToEndCalculator.cs" />
+    <Compile Include="Interfaces\Converters\ICostEndToStartCalculator.cs" />
+    <Compile Include="Interfaces\Converters\ICostStartToEndCalculator.cs" />
+    <Compile Include="Interfaces\Converters\ICostStartToStartCalculator.cs" />
+    <Compile Include="Interfaces\Converters\ILineToLinesConverter.cs" />
     <Compile Include="Converters\LineToLinesConverter.cs" />
     <Compile Include="Converters\Dtos\Racetracks.cs" />
     <Compile Include="CostMatrix.cs" />
     <Compile Include="CostMatrixSourceManager.cs" />
-    <Compile Include="ICostMatrix.cs" />
-    <Compile Include="ICostMatrixSourceManager.cs" />
-    <Compile Include="ILinesValidator.cs" />
-    <Compile Include="IRacetracksToDtoConverter.cs" />
+    <Compile Include="Interfaces\ICostMatrix.cs" />
+    <Compile Include="Interfaces\ICostMatrixSourceManager.cs" />
+    <Compile Include="Interfaces\ILinesValidator.cs" />
+    <Compile Include="Interfaces\IRacetracksToDtoConverter.cs" />
     <Compile Include="LinesValidator.cs" />
     <Compile Include="LineToLineDtoConverter.cs" />
     <Compile Include="Converters\Dtos\RacetracksToDtoConverter.cs" />
+    <Compile Include="RacetrackSettings.cs" />
     <Compile Include="TypedFactories\ICostMatrixFactory.cs" />
-    <Compile Include="ILinesSource.cs" />
-    <Compile Include="ILinesSourceManager.cs" />
-    <Compile Include="IRacetrackSettingsSource.cs" />
-    <Compile Include="IRacetrackSettingsSourceManager.cs" />
-    <Compile Include="IRacetracksSourceManager.cs" />
-    <Compile Include="IService.cs" />
+    <Compile Include="Interfaces\ILinesSource.cs" />
+    <Compile Include="Interfaces\ILinesSourceManager.cs" />
+    <Compile Include="Interfaces\IRacetrackSettingsSource.cs" />
+    <Compile Include="Interfaces\IRacetrackSettingsSourceManager.cs" />
+    <Compile Include="Interfaces\IRacetracksSourceManager.cs" />
+    <Compile Include="Interfaces\IService.cs" />
     <Compile Include="Installer.cs" />
     <Compile Include="LinesSourceManager.cs" />
     <Compile Include="RacetrackSettingsSource.cs" />

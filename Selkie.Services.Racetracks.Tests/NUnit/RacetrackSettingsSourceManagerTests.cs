@@ -2,9 +2,8 @@
 using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
 using NUnit.Framework;
-using Selkie.EasyNetQ;
 using Selkie.NUnit.Extensions;
-using Selkie.Services.Racetracks.Common.Messages;
+using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks.Tests.NUnit
@@ -18,44 +17,25 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         public void Setup()
         {
             m_Logger = Substitute.For <ISelkieLogger>();
-            m_Bus = Substitute.For <ISelkieBus>();
 
-            m_Manager = new RacetrackSettingsSourceManager(m_Logger,
-                                                           m_Bus);
+            m_Manager = new RacetrackSettingsSourceManager(m_Logger);
         }
 
-        private ISelkieBus m_Bus;
         private ISelkieLogger m_Logger;
         private RacetrackSettingsSourceManager m_Manager;
 
         [Test]
-        public void DefaultSourceTest()
+        public void SetSettings_SetsTurnRadiusForPort_WhenCalled()
         {
-            Assert.NotNull(m_Manager.Source);
-        }
+            var settings = new RacetrackSettings
+                           {
+                               TurnRadiusForPort = 100.0,
+                               TurnRadiusForStarboard = 200.0,
+                               IsPortTurnAllowed = true,
+                               IsStarboardTurnAllowed = true
+                           };
 
-        [Test]
-        public void RacetrackSettingsGetHandlerSendsMessageTest()
-        {
-            var message = new RacetrackSettingsGetMessage();
-
-            m_Manager.RacetrackSettingsGetHandler(message);
-
-            m_Bus.Received().PublishAsync(Arg.Any <RacetrackSettingsChangedMessage>());
-        }
-
-        [Test]
-        public void RacetrackSettingsSetHandlerCreatesNewSourceTest()
-        {
-            var message = new RacetrackSettingsSetMessage
-                          {
-                              TurnRadiusForPort = 100.0,
-                              TurnRadiusForStarboard = 200.0,
-                              IsPortTurnAllowed = true,
-                              IsStarboardTurnAllowed = true
-                          };
-
-            m_Manager.RacetrackSettingsSetHandler(message);
+            m_Manager.SetSettings(settings);
 
             IRacetrackSettingsSource actual = m_Manager.Source;
 
@@ -64,102 +44,69 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void RacetrackSettingsSetHandlerSendsMessageTest()
+        public void SetSettings_ThrowsException_ForTurnRadiusForPortIsNegative()
         {
-            var message = new RacetrackSettingsSetMessage
-                          {
-                              TurnRadiusForPort = 100.0,
-                              TurnRadiusForStarboard = 200.0,
-                              IsPortTurnAllowed = true,
-                              IsStarboardTurnAllowed = true
-                          };
+            var settings = new RacetrackSettings
+                           {
+                               TurnRadiusForPort = -1.0,
+                               TurnRadiusForStarboard = 1.0,
+                               IsPortTurnAllowed = true,
+                               IsStarboardTurnAllowed = true
+                           };
 
-            m_Manager.RacetrackSettingsSetHandler(message);
-
-            m_Bus.Received().PublishAsync(Arg.Any <RacetrackSettingsChangedMessage>());
+            Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
         [Test]
-        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusForPortIsNegativeTest()
+        public void SetSettings_ThrowsException_ForTurnRadiusForPortIsZero()
         {
-            var message = new RacetrackSettingsSetMessage
-                          {
-                              TurnRadiusForPort = -1.0,
-                              TurnRadiusForStarboard = 1.0,
-                              IsPortTurnAllowed = true,
-                              IsStarboardTurnAllowed = true
-                          };
+            var settings = new RacetrackSettings
+                           {
+                               TurnRadiusForPort = 0.0,
+                               TurnRadiusForStarboard = 1.0,
+                               IsPortTurnAllowed = true,
+                               IsStarboardTurnAllowed = true
+                           };
 
-            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetHandler(message));
+            Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
         [Test]
-        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusForPortIsZeroTest()
+        public void SetSettings_ThrowsException_ForTurnRadiusForStarboardIsNegative()
         {
-            var message = new RacetrackSettingsSetMessage
-                          {
-                              TurnRadiusForPort = 0.0,
-                              TurnRadiusForStarboard = 1.0,
-                              IsPortTurnAllowed = true,
-                              IsStarboardTurnAllowed = true
-                          };
+            var settings = new RacetrackSettings
+                           {
+                               TurnRadiusForPort = 1.0,
+                               TurnRadiusForStarboard = -1.0,
+                               IsPortTurnAllowed = true,
+                               IsStarboardTurnAllowed = true
+                           };
 
-            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetHandler(message));
+            Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
         [Test]
-        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusForStarboardIsNegativeTest()
+        public void SetSettings_ThrowsException_ForTurnRadiusForStarboardIsZero()
         {
-            var message = new RacetrackSettingsSetMessage
-                          {
-                              TurnRadiusForPort = 1.0,
-                              TurnRadiusForStarboard = -1.0,
-                              IsPortTurnAllowed = true,
-                              IsStarboardTurnAllowed = true
-                          };
+            var settings = new RacetrackSettings
+                           {
+                               TurnRadiusForPort = 1.0,
+                               TurnRadiusForStarboard = 0.0,
+                               IsPortTurnAllowed = true,
+                               IsStarboardTurnAllowed = true
+                           };
 
-            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetHandler(message));
+            Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
         [Test]
-        public void RacetrackSettingsSetHandlerThrowsForTurnRadiusForStarboardIsZeroTest()
+        public void Source_ReturnsDefault_WhenCalled()
         {
-            var message = new RacetrackSettingsSetMessage
-                          {
-                              TurnRadiusForPort = 1.0,
-                              TurnRadiusForStarboard = 0.0,
-                              IsPortTurnAllowed = true,
-                              IsStarboardTurnAllowed = true
-                          };
-
-            Assert.Throws <ArgumentException>(() => m_Manager.RacetrackSettingsSetHandler(message));
+            Assert.NotNull(m_Manager.Source);
         }
 
         [Test]
-        public void SendRacetrackSettingsChangedMessageSendsMessageTest()
-        {
-            var source = Substitute.For <IRacetrackSettingsSource>();
-            source.TurnRadiusForPort.Returns(1.0);
-            source.TurnRadiusForStarboard.Returns(2.0);
-            source.IsPortTurnAllowed.Returns(true);
-            source.IsStarboardTurnAllowed.Returns(true);
-
-            m_Manager.SendRacetrackSettingsChangedMessage(source);
-
-            m_Bus.Received()
-                 .PublishAsync(
-                               Arg.Is <RacetrackSettingsChangedMessage>(
-                                                                        x =>
-                                                                        Math.Abs(x.TurnRadiusForPort - 1.0) <
-                                                                        0.1 &&
-                                                                        Math.Abs(x.TurnRadiusForStarboard - 2.0) <
-                                                                        0.1 &&
-                                                                        x.IsPortTurnAllowed &&
-                                                                        x.IsStarboardTurnAllowed));
-        }
-
-        [Test]
-        public void StartCallsLoggerTest()
+        public void Start_CallsLogger_WhenCalled()
         {
             m_Manager.Start();
 
@@ -167,25 +114,11 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void StopCallsLoggerTest()
+        public void Stop_CallsLogger_WhenCalled()
         {
             m_Manager.Stop();
 
             m_Logger.Received().Info(Arg.Is <string>(x => x.StartsWith("Stopped")));
-        }
-
-        [Test]
-        public void SubscribesToRacetrackSettingsGetMessageTest()
-        {
-            m_Bus.Received().SubscribeAsync(m_Manager.GetType().ToString(),
-                                            Arg.Any <Action <RacetrackSettingsGetMessage>>());
-        }
-
-        [Test]
-        public void SubscribesToRacetrackSettingsSetMessageTest()
-        {
-            m_Bus.Received().SubscribeAsync(m_Manager.GetType().ToString(),
-                                            Arg.Any <Action <RacetrackSettingsSetMessage>>());
         }
     }
 }

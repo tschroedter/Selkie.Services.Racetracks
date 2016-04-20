@@ -1,7 +1,8 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Selkie.Geometry.Shapes;
-using Selkie.Racetrack;
+using Selkie.Racetrack.Interfaces;
+using Selkie.Services.Racetracks.Interfaces.Converters;
 using Selkie.Windsor;
 using Selkie.Windsor.Extensions;
 
@@ -10,7 +11,7 @@ namespace Selkie.Services.Racetracks.Converters
     // todo use Fody!!!!
     public abstract class BaseCostCalculator : IBaseCostCalculator
     {
-        private readonly ISelkieLogger m_Logger;
+        protected readonly ISelkieLogger Logger;
         private readonly object m_Padlock = new object();
         private Dictionary <int, double> m_Costs = new Dictionary <int, double>();
         private ILine m_Line = Geometry.Shapes.Line.Unknown;
@@ -23,7 +24,7 @@ namespace Selkie.Services.Racetracks.Converters
 
         protected BaseCostCalculator([NotNull] ISelkieLogger logger)
         {
-            m_Logger = logger;
+            Logger = logger;
         }
 
         public Dictionary <int, double> Costs
@@ -81,21 +82,9 @@ namespace Selkie.Services.Racetracks.Converters
         [NotNull]
         private Dictionary <int, double> CalculateCost()
         {
-            if ( m_Racetracks.ForwardToForward.Length == 0 )
-            {
-                m_Logger.Error("Racetracks is not set!"); // todo testing
+            var costs = new Dictionary <int, double>();
 
-                return new Dictionary <int, double>();
-            }
-
-            return CalcuateCostForLines();
-        }
-
-        private Dictionary <int, double> CalcuateCostForLines()
-        {
-            var costs = new Dictionary<int, double>();
-
-            foreach (ILine otherLine in Lines)
+            foreach ( ILine otherLine in Lines )
             {
                 double cost = CostMatrix.CostToMyself;
 
@@ -120,10 +109,9 @@ namespace Selkie.Services.Racetracks.Converters
         {
             if ( !IsValidLineId(fromLineId) )
             {
-                string message = "Invalid line id! - fromLineId = {0} paths[{1}][]".Inject(fromLineId,
-                                                                                           m_Racetracks.ForwardToForward
-                                                                                                       .Length);
-                m_Logger.Warn(message);
+                string message = "fromLineId = {0} paths[{1}][]".Inject(fromLineId,
+                                                                        m_Racetracks.ForwardToForward.Length);
+                Logger.Warn(message);
 
                 return 0.0;
             }
@@ -132,7 +120,7 @@ namespace Selkie.Services.Racetracks.Converters
             {
                 string message = "toLineId = {0} paths[{1}][]".Inject(fromLineId,
                                                                       m_Racetracks.ForwardToForward.Length);
-                m_Logger.Warn(message);
+                Logger.Warn(message);
 
                 return 0.0;
             }

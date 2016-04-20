@@ -5,6 +5,7 @@ using NSubstitute;
 using Ploeh.AutoFixture.Xunit;
 using Selkie.EasyNetQ;
 using Selkie.Services.Racetracks.Common.Messages;
+using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Services.Racetracks.TypedFactories;
 using Selkie.Windsor;
 using Selkie.XUnit.Extensions;
@@ -17,23 +18,11 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
     [ExcludeFromCodeCoverage]
     public sealed class CostMatrixSourceManagerTests
     {
-        [Theory]
-        [AutoNSubstituteData]
-        public void SubscribesToCostMatrixGetMessage([NotNull] [Frozen] ISelkieBus bus,
-                                                     [NotNull] CostMatrixSourceManager sut)
-        {
-            // assemble
-            // act
-            string subscriptionId = sut.GetType().FullName;
-
-            // assert
-            bus.Received().SubscribeAsync(subscriptionId,
-                                          Arg.Any <Action <CostMatrixGetMessage>>());
-        }
+        private const double Tolerance = 0.00001;
 
         [Theory]
         [AutoNSubstituteData]
-        public void SubscribesToRacetracksChangedMessage([NotNull] [Frozen] ISelkieBus bus,
+        public void SubscribesToCostMatrixRequestMessage([NotNull] [Frozen] ISelkieBus bus,
                                                          [NotNull] CostMatrixSourceManager sut)
         {
             // assemble
@@ -42,20 +31,7 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
             // assert
             bus.Received().SubscribeAsync(subscriptionId,
-                                          Arg.Any <Action <RacetracksChangedMessage>>());
-        }
-
-        [Theory]
-        [AutoNSubstituteData]
-        public void ConstructorSendsRacetrackSettingsGetMessage([NotNull] [Frozen] ISelkieBus bus,
-                                                                [NotNull] CostMatrixSourceManager sut)
-        {
-            // assemble
-            // act
-            sut.UpdateSource();
-
-            // assert
-            bus.Received().PublishAsync(Arg.Any <RacetrackSettingsGetMessage>());
+                                          Arg.Any <Action <CostMatrixRequestMessage>>());
         }
 
         [Theory]
@@ -72,6 +48,9 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
         public void UpdateSourceSetsSource([NotNull] ISelkieBus bus,
                                            [NotNull] ISelkieLogger logger,
                                            [NotNull] IRacetracksToDtoConverter converter,
+                                           [NotNull] ILinesSourceManager linesSourceManager,
+                                           [NotNull] IRacetrackSettingsSourceManager racetrackSettingsSourceManager,
+                                           [NotNull] IRacetracksSourceManager racetracksSourceManager,
                                            [NotNull] ICostMatrix costMatrix)
         {
             // assemble
@@ -81,6 +60,9 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
             var manager = new CostMatrixSourceManager(bus,
                                                       logger,
+                                                      linesSourceManager,
+                                                      racetrackSettingsSourceManager,
+                                                      racetracksSourceManager,
                                                       factory);
 
             // act
@@ -93,9 +75,13 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
         [Theory]
         [AutoNSubstituteData]
-        public void UpdateSourceSendsCostMatrixChangedMessage([NotNull] ISelkieBus bus,
-                                                              [NotNull] ISelkieLogger logger,
-                                                              [NotNull] ICostMatrix costMatrix)
+        public void UpdateSourceSendsCostMatrixResponseMessage(
+            [NotNull] ISelkieBus bus,
+            [NotNull] ISelkieLogger logger,
+            [NotNull] ILinesSourceManager linesSourceManager,
+            [NotNull] IRacetrackSettingsSourceManager racetrackSettingsSourceManager,
+            [NotNull] IRacetracksSourceManager racetracksSourceManager,
+            [NotNull] ICostMatrix costMatrix)
         {
             // assemble
             var factory = Substitute.For <ICostMatrixFactory>();
@@ -103,6 +89,9 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
             CostMatrixSourceManager sut = ConfigureManagerWithtMatrix(bus,
                                                                       logger,
+                                                                      linesSourceManager,
+                                                                      racetrackSettingsSourceManager,
+                                                                      racetracksSourceManager,
                                                                       costMatrix);
 
 
@@ -110,14 +99,18 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
             sut.UpdateSource();
 
             // assert
-            bus.Received().PublishAsync(Arg.Is <CostMatrixChangedMessage>(x => x.Matrix == costMatrix.Matrix));
+            bus.Received().PublishAsync(Arg.Is <CostMatrixResponseMessage>(x => x.Matrix == costMatrix.Matrix));
         }
 
         [Theory]
         [AutoNSubstituteData]
         public void UpdateSourceReleasesOldSource([NotNull] ISelkieBus bus,
                                                   [NotNull] ISelkieLogger logger,
-                                                  [NotNull] IRacetracksToDtoConverter converter)
+                                                  [NotNull] IRacetracksToDtoConverter converter,
+                                                  [NotNull] IRacetrackSettingsSourceManager
+                                                      racetrackSettingsSourceManager,
+                                                  [NotNull] ILinesSourceManager linesSourceManager,
+                                                  [NotNull] IRacetracksSourceManager racetracksSourceManager)
         {
             // assemble
             var factory = Substitute.For <ICostMatrixFactory>();
@@ -130,6 +123,9 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
             var manager = new CostMatrixSourceManager(bus,
                                                       logger,
+                                                      linesSourceManager,
+                                                      racetrackSettingsSourceManager,
+                                                      racetracksSourceManager,
                                                       factory);
 
             // act
@@ -152,49 +148,45 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
             sut.CostMatrixCalculateHandler(message);
 
             // assert
-            bus.Received().PublishAsync(Arg.Any <CostMatrixChangedMessage>());
+            bus.Received().PublishAsync(Arg.Any <CostMatrixResponseMessage>());
         }
 
         [Theory]
         [AutoNSubstituteData]
-        public void RacetracksChangedHandlerCallsUpdateSource([NotNull] [Frozen] ISelkieBus bus,
-                                                              [NotNull] CostMatrixSourceManager sut)
-        {
-            // assemble
-            var message = new RacetracksChangedMessage();
-
-            // act
-            sut.RacetracksChangedHandler(message);
-
-            // assert
-            bus.Received().PublishAsync(Arg.Any <CostMatrixChangedMessage>());
-        }
-
-        [Theory]
-        [AutoNSubstituteData]
-        public void CostMatrixGetHandlerSendMessage([NotNull] ISelkieBus bus,
-                                                    [NotNull] ISelkieLogger logger,
-                                                    [NotNull] IRacetracksToDtoConverter converter,
-                                                    [NotNull] ICostMatrix costMatrix)
+        public void CostMatrixGetHandlerSendMessage(
+            [NotNull] ISelkieBus bus,
+            [NotNull] ISelkieLogger logger,
+            [NotNull] IRacetracksToDtoConverter converter,
+            [NotNull] ILinesSourceManager linesSourceManager,
+            [NotNull] IRacetrackSettingsSourceManager racetrackSettingsSourceManager,
+            [NotNull] IRacetracksSourceManager racetracksSourceManager,
+            [NotNull] ICostMatrix costMatrix)
         {
             // assemble
             CostMatrixSourceManager sut = ConfigureManagerWithtMatrix(bus,
                                                                       logger,
+                                                                      linesSourceManager,
+                                                                      racetrackSettingsSourceManager,
+                                                                      racetracksSourceManager,
                                                                       costMatrix);
 
             bus.ClearReceivedCalls();
 
             // act
-            sut.CostMatrixGetHandler(new CostMatrixGetMessage());
+            sut.CostMatrixGetHandler(new CostMatrixRequestMessage());
 
             // assert
-            bus.Received().PublishAsync(Arg.Is <CostMatrixChangedMessage>(x => x.Matrix == costMatrix.Matrix));
+            bus.Received().PublishAsync(Arg.Is <CostMatrixResponseMessage>(x => x.Matrix == costMatrix.Matrix));
         }
 
         [NotNull]
-        private static CostMatrixSourceManager ConfigureManagerWithtMatrix([NotNull] ISelkieBus bus,
-                                                                           [NotNull] ISelkieLogger logger,
-                                                                           [NotNull] ICostMatrix costMatrix)
+        private static CostMatrixSourceManager ConfigureManagerWithtMatrix(
+            [NotNull] ISelkieBus bus,
+            [NotNull] ISelkieLogger logger,
+            [NotNull] ILinesSourceManager linesSourceManager,
+            [NotNull] IRacetrackSettingsSourceManager racetrackSettingsSourceManager,
+            [NotNull] IRacetracksSourceManager racetracksSourceManager,
+            [NotNull] ICostMatrix costMatrix)
         {
             costMatrix.Matrix.Returns(new[]
                                       {
@@ -209,6 +201,9 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
             var manager = new CostMatrixSourceManager(bus,
                                                       logger,
+                                                      linesSourceManager,
+                                                      racetrackSettingsSourceManager,
+                                                      racetracksSourceManager,
                                                       factory);
 
             manager.UpdateSource();
@@ -239,6 +234,61 @@ namespace Selkie.Services.Racetracks.Tests.XUnit
 
             // assert
             logger.Received().Info(Arg.Is <string>(x => x.StartsWith("Stopped")));
+        }
+
+        [Theory]
+        [AutoNSubstituteData]
+        public void PreUpdateSource_SetsLines_WhenCalled(
+            [NotNull] CostMatrixCalculateMessage message,
+            [NotNull] [Frozen] ILinesSourceManager manager,
+            [NotNull] CostMatrixSourceManager sut)
+        {
+            // assemble
+
+            // act
+            sut.PreUpdateSource(message);
+
+            // assert
+            manager.Received().SetLinesIfValid(message.LineDtos);
+        }
+
+        [Theory]
+        [AutoNSubstituteData]
+        public void PreUpdateSource_SetsRacetrackSettings_WhenCalled(
+            [NotNull] CostMatrixCalculateMessage message,
+            [NotNull] [Frozen] IRacetrackSettingsSourceManager manager,
+            [NotNull] CostMatrixSourceManager sut)
+        {
+            // assemble
+
+            // act
+            sut.PreUpdateSource(message);
+
+            // assert
+            manager.Received()
+                   .SetSettings(Arg.Is <RacetrackSettings>(x => x.IsPortTurnAllowed == message.IsPortTurnAllowed &&
+                                                                x.IsStarboardTurnAllowed ==
+                                                                message.IsStarboardTurnAllowed &&
+                                                                Math.Abs(x.TurnRadiusForPort - message.TurnRadiusForPort) <
+                                                                Tolerance &&
+                                                                Math.Abs(x.TurnRadiusForStarboard -
+                                                                         message.TurnRadiusForStarboard) < Tolerance));
+        }
+
+        [Theory]
+        [AutoNSubstituteData]
+        public void PreUpdateSource_CalculateRacetracks_WhenCalled(
+            [NotNull] CostMatrixCalculateMessage message,
+            [NotNull] [Frozen] IRacetracksSourceManager manager,
+            [NotNull] CostMatrixSourceManager sut)
+        {
+            // assemble
+
+            // act
+            sut.PreUpdateSource(message);
+
+            // assert
+            manager.Received().CalculateRacetracks();
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using Selkie.Geometry.Shapes;
 using Selkie.Services.Common.Dto;
+using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks

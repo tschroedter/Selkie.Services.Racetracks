@@ -3,7 +3,7 @@ using NSubstitute;
 using NUnit.Framework;
 using Selkie.Geometry.Primitives;
 using Selkie.NUnit.Extensions;
-using Selkie.Racetrack;
+using Selkie.Racetrack.Interfaces;
 using Selkie.Services.Racetracks.Converters;
 using Selkie.Windsor;
 using Constants = Selkie.Common.Constants;

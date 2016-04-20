@@ -4,16 +4,16 @@ using TechTalk.SpecFlow;
 
 namespace Selkie.Services.Racetracks.SpecFlow.Steps
 {
-    public class ThenTheResultShouldBeThatIReceivedARacetracksChangedMessage : BaseStep
+    public class ThenTheResultShouldBeThatIReceivedARacetracksResponseMessage : BaseStep
     {
-        [Then(@"the result should be that I received a RacetracksChangedMessage")]
+        [Then(@"the result should be that I received a RacetracksResponseMessage")]
         public override void Do()
         {
-            SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedRacetracksChangedMessage" ],
+            SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedRacetracksResponseMessage" ],
                            DoNothing);
 
-            Assert.True(( bool ) ScenarioContext.Current [ "IsReceivedRacetracksChangedMessage" ],
-                        "Did not receive RacetracksChangedMessage!");
+            Assert.True(( bool ) ScenarioContext.Current [ "IsReceivedRacetracksResponseMessage" ],
+                        "Did not receive RacetracksResponseMessage!");
         }
     }
 }

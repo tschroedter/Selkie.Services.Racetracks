@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Selkie.Racetrack;
+using Selkie.Racetrack.Interfaces;
 using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.XUnit

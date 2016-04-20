@@ -4,10 +4,11 @@ using JetBrains.Annotations;
 using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
 using Selkie.Geometry.Primitives;
-using Selkie.Racetrack;
-using Selkie.Racetrack.Calculators;
+using Selkie.Racetrack.Interfaces;
+using Selkie.Racetrack.Interfaces.Calculators;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
+using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Windsor;
 using Selkie.Windsor.Extensions;
 
@@ -44,21 +45,15 @@ namespace Selkie.Services.Racetracks
             m_Converter = converter;
 
             string subscriptionId = GetType().FullName;
-            m_Bus.SubscribeAsync <RacetrackSettingsChangedMessage>(subscriptionId,
-                                                                   RacetrackSettingsChangedHandler);
 
             m_Bus.SubscribeAsync <RacetracksGetMessage>(subscriptionId,
                                                         RacetracksGetHandler);
-
-            m_Bus.PublishAsync(new RacetrackSettingsGetMessage());
         }
 
         public void Dispose()
         {
             m_Factory.Release(m_RacetracksCalculator);
         }
-
-        #region IRacetracksSourceManager Members
 
         public IRacetracks Racetracks
         {
@@ -68,14 +63,14 @@ namespace Selkie.Services.Racetracks
             }
         }
 
-        #endregion
-
-        internal void RacetrackSettingsChangedHandler(RacetrackSettingsChangedMessage message)
+        public void CalculateRacetracks()
         {
-            Update();
+            Calculate();
+
+            SendRacetracksResponseMessage(Racetracks);
         }
 
-        internal void Update()
+        internal void Calculate()
         {
             m_Factory.Release(m_RacetracksCalculator);
 
@@ -90,8 +85,6 @@ namespace Selkie.Services.Racetracks
             m_RacetracksCalculator.IsPortTurnAllowed = source.IsPortTurnAllowed;
             m_RacetracksCalculator.IsStarboardTurnAllowed = source.IsStarboardTurnAllowed;
             m_RacetracksCalculator.Calculate();
-
-            SendRacetracksChangedMessage(Racetracks);
         }
 
         private void LogRacetrackSettings([NotNull] IRacetrackSettingsSource source)
@@ -109,14 +102,14 @@ namespace Selkie.Services.Racetracks
 
         internal void RacetracksGetHandler(RacetracksGetMessage message)
         {
-            SendRacetracksChangedMessage(Racetracks);
+            SendRacetracksResponseMessage(Racetracks);
         }
 
-        internal void SendRacetracksChangedMessage([NotNull] IRacetracks racetracks)
+        internal void SendRacetracksResponseMessage([NotNull] IRacetracks racetracks)
         {
             RacetracksDto racetracksDto = m_Converter.ConvertPaths(racetracks);
 
-            var response = new RacetracksChangedMessage
+            var response = new RacetracksResponseMessage
                            {
                                Racetracks = racetracksDto
                            };

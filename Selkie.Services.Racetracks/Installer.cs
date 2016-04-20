@@ -4,8 +4,9 @@ using Castle.MicroKernel.Registration;
 using Castle.MicroKernel.SubSystems.Configuration;
 using Castle.Windsor;
 using Selkie.Common;
-using Selkie.Racetrack.Calculators;
-using Selkie.Services.Racetracks.Converters;
+using Selkie.Racetrack.Interfaces.Calculators;
+using Selkie.Services.Common;
+using Selkie.Services.Racetracks.Interfaces.Converters;
 
 namespace Selkie.Services.Racetracks
 {
@@ -21,8 +22,8 @@ namespace Selkie.Services.Racetracks
             // ReSharper disable MaximumChainedReferences
             container.Register(
                                Classes.FromThisAssembly()
-                                      .BasedOn <Services.Common.IService>()
-                                      .WithServiceFromInterface(typeof ( Services.Common.IService ))
+                                      .BasedOn <IService>()
+                                      .WithServiceFromInterface(typeof ( IService ))
                                       .Configure(c => c.LifeStyle.Is(LifestyleType.Transient)));
 
             container.Register(

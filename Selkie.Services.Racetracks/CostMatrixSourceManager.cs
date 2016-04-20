@@ -1,13 +1,16 @@
 ﻿using Castle.Core;
 using JetBrains.Annotations;
+using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
 using Selkie.Services.Racetracks.Common.Messages;
+using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Services.Racetracks.TypedFactories;
 using Selkie.Windsor;
 using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
+    [Interceptor(typeof ( MessageHandlerAspect ))]
     [ProjectComponent(Lifestyle.Singleton)]
     public class CostMatrixSourceManager
         : ICostMatrixSourceManager,
@@ -15,16 +18,25 @@ namespace Selkie.Services.Racetracks
     {
         private readonly ISelkieBus m_Bus;
         private readonly ICostMatrixFactory m_Factory;
+        private readonly ILinesSourceManager m_LinesSourceManager;
         private readonly ISelkieLogger m_Logger;
         private readonly object m_Padlock = new object();
+        private readonly IRacetrackSettingsSourceManager m_RacetrackSettingsSourceManager;
+        private readonly IRacetracksSourceManager m_RacetracksSourceManager;
         private ICostMatrix m_Source = CostMatrix.Unkown;
 
         public CostMatrixSourceManager([NotNull] ISelkieBus bus,
                                        [NotNull] ISelkieLogger logger,
+                                       [NotNull] ILinesSourceManager linesSourceManager,
+                                       [NotNull] IRacetrackSettingsSourceManager racetrackSettingsSourceManager,
+                                       [NotNull] IRacetracksSourceManager racetracksSourceManager,
                                        [NotNull] ICostMatrixFactory factory)
         {
             m_Bus = bus;
             m_Logger = logger;
+            m_LinesSourceManager = linesSourceManager;
+            m_RacetrackSettingsSourceManager = racetrackSettingsSourceManager;
+            m_RacetracksSourceManager = racetracksSourceManager;
             m_Factory = factory;
 
             string subscriptionId = GetType().FullName;
@@ -32,27 +44,18 @@ namespace Selkie.Services.Racetracks
             m_Bus.SubscribeAsync <CostMatrixCalculateMessage>(subscriptionId,
                                                               CostMatrixCalculateHandler);
 
-            m_Bus.SubscribeAsync <CostMatrixGetMessage>(subscriptionId,
-                                                        CostMatrixGetHandler);
-
-            m_Bus.SubscribeAsync <RacetracksChangedMessage>(subscriptionId,
-                                                            RacetracksChangedHandler);
-
-            m_Bus.PublishAsync(new RacetrackSettingsGetMessage());
+            m_Bus.SubscribeAsync <CostMatrixRequestMessage>(subscriptionId,
+                                                            CostMatrixGetHandler);
         }
 
         public ICostMatrix Source
         {
             get
             {
-                ICostMatrix source;
-
                 lock ( m_Padlock )
                 {
-                    source = m_Source;
+                    return m_Source;
                 }
-
-                return source;
             }
         }
 
@@ -68,12 +71,26 @@ namespace Selkie.Services.Racetracks
 
         internal void CostMatrixCalculateHandler([NotNull] CostMatrixCalculateMessage message)
         {
+            PreUpdateSource(message);
+
             UpdateSource();
         }
 
-        internal void RacetracksChangedHandler(RacetracksChangedMessage message)
+        internal void PreUpdateSource(CostMatrixCalculateMessage message)
         {
-            UpdateSource();
+            m_LinesSourceManager.SetLinesIfValid(message.LineDtos);
+
+            var settings = new RacetrackSettings
+                           {
+                               IsPortTurnAllowed = message.IsPortTurnAllowed,
+                               IsStarboardTurnAllowed = message.IsStarboardTurnAllowed,
+                               TurnRadiusForPort = message.TurnRadiusForPort,
+                               TurnRadiusForStarboard = message.TurnRadiusForStarboard
+                           };
+
+            m_RacetrackSettingsSourceManager.SetSettings(settings);
+
+            m_RacetracksSourceManager.CalculateRacetracks();
         }
 
         internal void UpdateSource()
@@ -90,19 +107,19 @@ namespace Selkie.Services.Racetracks
                     m_Factory.Release(oldSource);
                 }
 
-                SendCostMatrixChangedMessage(costMatrix);
+                SendCostMatrixResponseMessage(costMatrix);
             }
         }
 
-        private void SendCostMatrixChangedMessage(ICostMatrix costMatrix)
+        private void SendCostMatrixResponseMessage(ICostMatrix costMatrix)
         {
-            m_Bus.PublishAsync(new CostMatrixChangedMessage
+            m_Bus.PublishAsync(new CostMatrixResponseMessage
                                {
                                    Matrix = costMatrix.Matrix
                                });
         }
 
-        internal void CostMatrixGetHandler([NotNull] CostMatrixGetMessage message)
+        internal void CostMatrixGetHandler([NotNull] CostMatrixRequestMessage message)
         {
             ICostMatrix costMatrix;
 
@@ -111,7 +128,7 @@ namespace Selkie.Services.Racetracks
                 costMatrix = m_Source;
             }
 
-            var response = new CostMatrixChangedMessage
+            var response = new CostMatrixResponseMessage
                            {
                                Matrix = costMatrix.Matrix
                            };

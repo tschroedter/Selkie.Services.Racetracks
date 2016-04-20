@@ -5,6 +5,7 @@ using Ploeh.AutoFixture.Xunit;
 using Selkie.Geometry.Shapes;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
+using Selkie.Services.Racetracks.Interfaces.Converters.Dtos;
 using Selkie.XUnit.Extensions;
 using Xunit;
 using Xunit.Extensions;

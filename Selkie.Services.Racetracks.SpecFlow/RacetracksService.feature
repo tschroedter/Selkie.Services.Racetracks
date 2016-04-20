@@ -23,58 +23,27 @@ Scenario: Starting service sends message
 
 Scenario: CostMatrix request and response
 	Given Service is running
-	And Did not receive CostMatrixChangedMessage
-	When I send a CostMatrixGetMessage
-	Then the result should be that I received a CostMatrixChangedMessage
+	And Did not receive CostMatrixResponseMessage
+	When I send a CostMatrixRequestMessage
+	Then the result should be that I received a CostMatrixResponseMessage
 
-Scenario: Lines set and changed
+Scenario: CostMatrixCalculate request and response
 	Given Service is running
-	And Did not receive LinesChangedMessage
-	When I send a LinesSetMessage
-	Then the result should be that I received a LinesChangedMessage
-
-Scenario: RacetrackSettings set and changed
-	Given Service is running
-	And Did not receive RacetrackSettingsChangedMessage
-	When I send a RacetrackSettingsSetMessage
-	Then the result should be that I received a RacetrackSettingsChangedMessage
-
-Scenario: CostMatrixCalculate set and changed
-	Given Service is running
-	And Did not receive CostMatrixChangedMessage
+	And Did not receive CostMatrixResponseMessage
 	When I send a CostMatrixCalculateMessage
-	Then the result should be that I received a CostMatrixChangedMessage
+	Then the result should be that I received a CostMatrixResponseMessage
 
-Scenario: CostMatrix is calculated
+Scenario: Calculating CostMatrix sends CostMatrixResponseMessage
 	Given Service is running
-	And Did not receive RacetrackSettingsChangedMessage
-	And Did not receive LinesChangedMessage
-	And Did not receive CostMatrixChangedMessage
-	When I send a RacetrackSettingsSetMessage
-	Then the result should be that I received a RacetrackSettingsChangedMessage
-	When I send a LinesSetMessage
-	Then the result should be that I received a LinesChangedMessage
+	And Did not receive CostMatrixResponseMessage
 	When I send a CostMatrixCalculateMessage
-	Then the CostMatrixChangedMessage contains the racetracks
+	Then the CostMatrixResponseMessage contains the racetracks
 
-Scenario: RacetracksGetMessage set and changed
+Scenario: RacetracksGetMessage request and response
 	Given Service is running
-	And Did not receive RacetrackSettingsChangedMessage
-	And Did not receive LinesChangedMessage
-	And Did not receive CostMatrixChangedMessage
-	When I send a RacetrackSettingsSetMessage
-	Then the result should be that I received a RacetrackSettingsChangedMessage
-	When I send a LinesSetMessage
-	Then the result should be that I received a LinesChangedMessage
+	And Did not receive CostMatrixResponseMessage
 	When I send a CostMatrixCalculateMessage
-	Then the CostMatrixChangedMessage contains the racetracks
-	Given Did not receive RacetracksChangedMessage
+	Then the CostMatrixResponseMessage contains the racetracks
+	Given Did not receive RacetracksResponseMessage
 	When I send a RacetracksGetMessage
-	Then the result should be that I received a RacetracksChangedMessage
-
-#	And Did not receive CostMatrixChangedMessage
-#	When I send a RacetrackSettingsSetMessage
-#	When I send a LinesSetMessage
-#	Then the result should be that I received a LinesChangedMessage
-#	When I send a CostMatrixCalculateMessage
-#	Then the CostMatrixChangedMessage contains the racetracks
+	Then the result should be that I received a RacetracksResponseMessage

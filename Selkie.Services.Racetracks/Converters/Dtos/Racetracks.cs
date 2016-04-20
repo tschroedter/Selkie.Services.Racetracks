@@ -1,4 +1,4 @@
-using Selkie.Racetrack;
+using Selkie.Racetrack.Interfaces;
 
 namespace Selkie.Services.Racetracks.Converters.Dtos
 {

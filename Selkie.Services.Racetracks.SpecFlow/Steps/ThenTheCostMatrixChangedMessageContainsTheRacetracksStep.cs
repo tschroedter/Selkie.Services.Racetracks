@@ -4,9 +4,9 @@ using TechTalk.SpecFlow;
 
 namespace Selkie.Services.Racetracks.SpecFlow.Steps
 {
-    public class ThenTheCostMatrixChangedMessageContainsTheRacetracksStep : BaseStep
+    public class ThenTheCostMatrixResponseMessageContainsTheRacetracksStep : BaseStep
     {
-        [Then(@"the CostMatrixChangedMessage contains the racetracks")]
+        [Then(@"the CostMatrixResponseMessage contains the racetracks")]
         public override void Do()
         {
             SleepWaitAndDo(IsReceived,
@@ -33,7 +33,7 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps
 
         private static bool IsReceived()
         {
-            var isReceived = ( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixChangedMessage" ];
+            var isReceived = ( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixResponseMessage" ];
             var matrix = ( double[][] ) ScenarioContext.Current [ "Matrix" ];
 
             bool received = isReceived && matrix.GetLength(0) == 4;

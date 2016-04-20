@@ -5,16 +5,16 @@ using TechTalk.SpecFlow;
 
 namespace Selkie.Services.Racetracks.SpecFlow.Steps
 {
-    public class ThenTheResultShouldBeThatIReceivedACostMatrixChangedMessageStep : BaseStep
+    public class ThenTheResultShouldBeThatIReceivedACostMatrixResponseMessageStep : BaseStep
     {
-        [Then(@"the result should be that I received a CostMatrixChangedMessage")]
+        [Then(@"the result should be that I received a CostMatrixResponseMessage")]
         public override void Do()
         {
-            SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixChangedMessage" ],
+            SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixResponseMessage" ],
                            SendMessages);
 
-            Assert.True(( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixChangedMessage" ],
-                        "Did not receive CostMatrixChangedMessage!");
+            Assert.True(( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixResponseMessage" ],
+                        "Did not receive CostMatrixResponseMessage!");
         }
 
         private void SendMessages()

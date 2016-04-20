@@ -11,48 +11,32 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
     {
         public void SubscribeOther()
         {
-            m_Bus.SubscribeAsync <LinesChangedMessage>(GetType().FullName,
-                                                       LinesChangedHandler);
+            m_Bus.SubscribeAsync <CostMatrixResponseMessage>(GetType().FullName,
+                                                             CostMatrixResponseHandler);
 
-            m_Bus.SubscribeAsync <RacetrackSettingsChangedMessage>(GetType().FullName,
-                                                                   RacetrackSettingsChangedHandler);
-
-            m_Bus.SubscribeAsync <CostMatrixChangedMessage>(GetType().FullName,
-                                                            CostMatrixChangedHandler);
-
-            m_Bus.SubscribeAsync <RacetracksChangedMessage>(GetType().FullName,
-                                                            RacetracksChangedHandler);
+            m_Bus.SubscribeAsync <RacetracksResponseMessage>(GetType().FullName,
+                                                             RacetracksResponseHandler);
         }
 
-        private void LinesChangedHandler([NotNull] LinesChangedMessage message)
+        private void CostMatrixResponseHandler([NotNull] CostMatrixResponseMessage message)
         {
-            ScenarioContext.Current [ "IsReceivedLinesChangedMessage" ] = true;
-        }
-
-        private void CostMatrixChangedHandler([NotNull] CostMatrixChangedMessage message)
-        {
-            ScenarioContext.Current [ "IsReceivedCostMatrixChangedMessage" ] = true;
+            ScenarioContext.Current [ "IsReceivedCostMatrixResponseMessage" ] = true;
             ScenarioContext.Current [ "Matrix" ] = message.Matrix;
         }
 
-        private void RacetrackSettingsChangedHandler([NotNull] RacetrackSettingsChangedMessage message)
-        {
-            ScenarioContext.Current [ "IsReceivedRacetrackSettingsChangedMessage" ] = true;
-        }
-
-        private void RacetracksChangedHandler([NotNull] RacetracksChangedMessage message)
+        private void RacetracksResponseHandler([NotNull] RacetracksResponseMessage message)
         {
             if ( IsRacetracksValid(message) )
             {
-                Console.WriteLine("Received 'empty' RacetracksChangedMessage!");
+                Console.WriteLine("Received 'empty' RacetracksResponseMessage!");
                 return;
             }
 
-            ScenarioContext.Current [ "IsReceivedRacetracksChangedMessage" ] = true;
+            ScenarioContext.Current [ "IsReceivedRacetracksResponseMessage" ] = true;
             ScenarioContext.Current [ "ReceivedRacetracks" ] = message.Racetracks;
         }
 
-        private static bool IsRacetracksValid(RacetracksChangedMessage message)
+        private static bool IsRacetracksValid(RacetracksResponseMessage message)
         {
             // todo currently just a rough test of the racetrack content, maybe better to check more details
             return message.Racetracks.ForwardToForward.Length != 2 ||

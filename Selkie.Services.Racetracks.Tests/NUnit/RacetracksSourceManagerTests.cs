@@ -5,10 +5,11 @@ using NSubstitute;
 using NUnit.Framework;
 using Selkie.EasyNetQ;
 using Selkie.Geometry.Shapes;
-using Selkie.Racetrack;
-using Selkie.Racetrack.Calculators;
+using Selkie.Racetrack.Interfaces;
+using Selkie.Racetrack.Interfaces.Calculators;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
+using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks.Tests.NUnit
@@ -79,82 +80,96 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void CalculateCallsCalculateTest()
+        public void CalculateRacetracks_CallsCalculate_WhenCalled()
         {
-            m_Manager.Update();
+            m_Manager.CalculateRacetracks();
 
             m_RacetracksCalculator.Received().Calculate();
         }
 
         [Test]
-        public void CalculateCallsCreateTest()
+        public void CalculateRacetracks_CallsCreate_WhenCalled()
         {
-            m_Manager.Update();
+            m_Manager.CalculateRacetracks();
 
             m_Factory.Received().Create <IRacetracksCalculator>();
         }
 
         [Test]
-        public void CalculateCallsReleaseTest()
+        public void CalculateRacetracks_CallsRelease_WhenCalled()
         {
             // assemble
-            m_Manager.Update();
+            m_Manager.CalculateRacetracks();
 
             // act
-            m_Manager.Update();
+            m_Manager.CalculateRacetracks();
 
             // assert
             m_Factory.Received().Release(m_RacetracksCalculator);
         }
 
         [Test]
-        public void CalculateSendsMessageTest()
+        public void CalculateRacetracks_SendsMessage_WhenCalled()
         {
-            m_Manager.Update();
+            m_Manager.CalculateRacetracks();
 
-            m_Bus.Received().PublishAsync(Arg.Any <RacetracksChangedMessage>());
+            m_Bus.Received().PublishAsync(Arg.Any <RacetracksResponseMessage>());
         }
 
         [Test]
-        public void CalculateSetsLinesTest()
+        public void CalculateRacetracks_SetsLines_WhenCalled()
         {
-            m_Manager.Update();
+            m_Manager.CalculateRacetracks();
 
             Assert.AreEqual(m_LinesSourceManager.Lines,
                             m_RacetracksCalculator.Lines);
         }
 
         [Test]
-        public void CalculateSetsTurnRadiusForPortTest()
+        public void CalculateRacetracks_SetsTurnRadius_ForPort()
         {
-            m_Manager.Update();
+            m_Manager.CalculateRacetracks();
 
             Assert.AreEqual(m_RacetrackSettingsSourceManager.Source.TurnRadiusForPort,
                             m_RacetracksCalculator.TurnRadiusForPort.Length);
         }
 
         [Test]
-        public void CalculateSetsTurnRadiusForStarboardTest()
+        public void CalculateRacetracks_SetsTurnRadius_ForStarboard()
         {
-            m_Manager.Update();
+            m_Manager.CalculateRacetracks();
 
             Assert.AreEqual(m_RacetrackSettingsSourceManager.Source.TurnRadiusForStarboard,
                             m_RacetracksCalculator.TurnRadiusForStarboard.Length);
         }
 
         [Test]
-        public void ConstructorSetsLinesTest()
+        public void Constructor_SetsLines_WhenCalled()
         {
             Assert.AreEqual(m_Lines,
                             m_RacetracksCalculator.Lines);
         }
 
         [Test]
-        public void DisposeCallsReleaseTest()
+        public void Constructor_SubscribesToRacetracksGetMessage_WhenCalled()
+        {
+            // assemble
+            RacetracksSourceManager sut = CreateSut();
+
+            // act
+            string subscriptionId = sut.GetType().FullName;
+
+            // assert
+            m_Bus.Received().SubscribeAsync(subscriptionId,
+                                            Arg.Any <Action <RacetracksGetMessage>>());
+        }
+
+        [Test]
+        public void Dispose_CallsRelease_WhenCalled()
         {
             // assemble
             RacetracksSourceManager manager = CreateSut();
-            manager.Update();
+            manager.CalculateRacetracks();
 
             // act
             manager.Dispose();
@@ -164,21 +179,19 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
         }
 
         [Test]
-        public void RacetrackSettingsChangedMessageCallsUpdateTest()
+        public void Racetracks_ReturnsRacetracks_WhenCalled()
         {
             // assemble
-            RacetracksSourceManager sut = CreateSut();
-            var message = new RacetrackSettingsChangedMessage();
-
             // act
-            sut.RacetrackSettingsChangedHandler(message);
+            m_Manager.CalculateRacetracks();
 
             // assert
-            m_RacetracksCalculator.Received().Calculate();
+            Assert.AreEqual(m_RacetracksCalculator,
+                            m_Manager.Racetracks);
         }
 
         [Test]
-        public void RacetracksGetHandlerCallsConverterTest()
+        public void RacetracksGetHandler_CallsConverter_WhenCalledt()
         {
             // assemble
             RacetracksSourceManager sut = CreateSut();
@@ -202,72 +215,20 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
             sut.RacetracksGetHandler(message);
 
             // assert
-            m_Bus.Received().PublishAsync(Arg.Any <RacetracksChangedMessage>());
+            m_Bus.Received().PublishAsync(Arg.Any <RacetracksResponseMessage>());
         }
 
         [Test]
-        public void RacetracksTest()
-        {
-            // assemble
-            // act
-            m_Manager.Update();
-
-            // assert
-            Assert.AreEqual(m_RacetracksCalculator,
-                            m_Manager.Racetracks);
-        }
-
-        [Test]
-        public void SendRacetracksChangedMessageSendsMessageTest()
+        public void SendRacetracksResponseMessage_SendsMessage_WhenCalled()
         {
             // assemble
             RacetracksSourceManager sut = CreateSut();
 
             // act
-            sut.SendRacetracksChangedMessage(Substitute.For <IRacetracks>());
+            sut.SendRacetracksResponseMessage(Substitute.For <IRacetracks>());
 
             // assert
-            m_Bus.Received().PublishAsync(Arg.Is <RacetracksChangedMessage>(x => x.Racetracks == m_RacetracksDto));
-        }
-
-        [Test]
-        public void SendsRacetrackSettingsGetMessageTest()
-        {
-            // assemble
-            // ReSharper disable once UnusedVariable
-            RacetracksSourceManager sut = CreateSut();
-
-            // act
-            // assert
-            m_Bus.Received().PublishAsync(Arg.Any <RacetrackSettingsGetMessage>());
-        }
-
-        [Test]
-        public void SubscribesToRacetrackSettingsChangedMessageTest()
-        {
-            // assemble
-            RacetracksSourceManager sut = CreateSut();
-
-            // act
-            string subscriptionId = sut.GetType().FullName;
-
-            // assert
-            m_Bus.Received().SubscribeAsync(subscriptionId,
-                                            Arg.Any <Action <RacetrackSettingsChangedMessage>>());
-        }
-
-        [Test]
-        public void SubscribesToRacetracksGetMessageTest()
-        {
-            // assemble
-            RacetracksSourceManager sut = CreateSut();
-
-            // act
-            string subscriptionId = sut.GetType().FullName;
-
-            // assert
-            m_Bus.Received().SubscribeAsync(subscriptionId,
-                                            Arg.Any <Action <RacetracksGetMessage>>());
+            m_Bus.Received().PublishAsync(Arg.Is <RacetracksResponseMessage>(x => x.Racetracks == m_RacetracksDto));
         }
     }
 }

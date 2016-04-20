@@ -5,6 +5,7 @@ using Selkie.EasyNetQ;
 using Selkie.Services.Common;
 using Selkie.Services.Common.Messages;
 using Selkie.Windsor;
+using IService = Selkie.Services.Racetracks.Interfaces.IService;
 
 namespace Selkie.Services.Racetracks
 {

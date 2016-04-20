@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Selkie.Geometry.Shapes;
-using Selkie.Racetrack;
+using Selkie.Racetrack.Interfaces;
+using Selkie.Services.Racetracks.Interfaces.Converters;
 
 namespace Selkie.Services.Racetracks.Converters
 {

@@ -3,8 +3,9 @@ using NSubstitute;
 using NUnit.Framework;
 using Selkie.Geometry.Shapes;
 using Selkie.NUnit.Extensions;
-using Selkie.Racetrack;
-using Selkie.Services.Racetracks.Converters;
+using Selkie.Racetrack.Interfaces;
+using Selkie.Services.Racetracks.Interfaces;
+using Selkie.Services.Racetracks.Interfaces.Converters;
 using Selkie.Services.Racetracks.TypedFactories;
 using Selkie.Windsor;
 using Constants = Selkie.Common.Constants;
@@ -475,13 +476,6 @@ namespace Selkie.Services.Racetracks.Tests.NUnit
                                            actual [ 3 ],
                                            Constants.EpsilonDistance,
                                            "actual[3]");
-        }
-
-        [Test]
-        public void RacetracksDefaultTest()
-        {
-            Assert.AreEqual(m_RacetracksSourceManager.Racetracks,
-                            m_CostMatrix.Racetracks);
         }
 
         [Test]
