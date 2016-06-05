@@ -19,25 +19,23 @@ namespace Selkie.Services.Racetracks
             base.InstallComponents(container,
                                    store);
 
-            // ReSharper disable MaximumChainedReferences
             container.Register(
                                Classes.FromThisAssembly()
                                       .BasedOn <IService>()
-                                      .WithServiceFromInterface(typeof ( IService ))
+                                      .WithServiceFromInterface(typeof( IService ))
                                       .Configure(c => c.LifeStyle.Is(LifestyleType.Transient)));
 
             container.Register(
                                Classes.FromThisAssembly()
                                       .BasedOn <IConverter>()
-                                      .WithServiceFromInterface(typeof ( IConverter ))
+                                      .WithServiceFromInterface(typeof( IConverter ))
                                       .Configure(c => c.LifeStyle.Is(LifestyleType.Transient)));
 
             container.Register(
                                Classes.FromThisAssembly()
                                       .BasedOn <ICalculator>()
-                                      .WithServiceFromInterface(typeof ( ICalculator ))
+                                      .WithServiceFromInterface(typeof( ICalculator ))
                                       .Configure(c => c.LifeStyle.Is(LifestyleType.Transient)));
-            // ReSharper restore MaximumChainedReferences
         }
     }
 }

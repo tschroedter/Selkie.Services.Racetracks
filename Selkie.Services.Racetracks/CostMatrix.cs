@@ -4,7 +4,7 @@ using System.Text;
 using Castle.Core;
 using JetBrains.Annotations;
 using Selkie.Aop.Aspects;
-using Selkie.Geometry.Shapes;
+using Selkie.Geometry.Surveying;
 using Selkie.Racetrack.Interfaces;
 using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Services.Racetracks.Interfaces.Converters;
@@ -14,31 +14,21 @@ using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
-    [Interceptor(typeof ( LogAspect ))]
+    [Interceptor(typeof( LogAspect ))]
     [ProjectComponent(Lifestyle.Transient)]
     public sealed class CostMatrix : ICostMatrix
     {
-        public static readonly ICostMatrix Unkown = new CostMatrix();
-        public static readonly double CostToMyself = 0.0;
-        private readonly IConverterFactory m_ConverterFactory;
-        private readonly ILinesSourceManager m_LinesSourceManager;
-        private readonly ISelkieLogger m_Logger;
-        private readonly IRacetracksSourceManager m_RacetracksSourceManager;
-        private ILine[] m_Lines = new ILine[0];
-        private double[][] m_Matrix = new double[0][];
-        private IRacetracks m_Racetracks = Converters.Dtos.Racetracks.Unknown;
-
         private CostMatrix()
         {
         }
 
         public CostMatrix([NotNull] ISelkieLogger logger,
-                          [NotNull] ILinesSourceManager linesSourceManager,
+                          [NotNull] ISurveyFeaturesSourceManager surveyFeaturesSourceManager,
                           [NotNull] IRacetracksSourceManager racetracksSourceManager,
                           [NotNull] IConverterFactory converterFactory)
         {
             m_Logger = logger;
-            m_LinesSourceManager = linesSourceManager;
+            m_SurveyFeaturesSourceManager = surveyFeaturesSourceManager;
             m_RacetracksSourceManager = racetracksSourceManager;
             m_ConverterFactory = converterFactory;
 
@@ -47,11 +37,21 @@ namespace Selkie.Services.Racetracks
             logger.Info("Created new CostMatrix!");
         }
 
-        public IEnumerable <ILine> Lines
+        public static readonly ICostMatrix Unkown = new CostMatrix();
+        public static readonly double CostToMyself = 0.0;
+        private readonly IConverterFactory m_ConverterFactory;
+        private readonly ISelkieLogger m_Logger;
+        private readonly IRacetracksSourceManager m_RacetracksSourceManager;
+        private readonly ISurveyFeaturesSourceManager m_SurveyFeaturesSourceManager;
+        private ISurveyFeature[] m_Features = new ISurveyFeature[0];
+        private double[][] m_Matrix = new double[0][];
+        private IRacetracks m_Racetracks = Converters.Dtos.Racetracks.Unknown;
+
+        public IEnumerable <ISurveyFeature> Features
         {
             get
             {
-                return m_Lines;
+                return m_Features;
             }
         }
 
@@ -74,138 +74,14 @@ namespace Selkie.Services.Racetracks
         public void Initialize()
         {
             // todo move into calculate method
-            IEnumerable <ILine> sourceLines = m_LinesSourceManager.Lines.ToArray();
+            IEnumerable <ISurveyFeature> features = m_SurveyFeaturesSourceManager.Features.ToArray();
 
-            m_Logger.Debug(LinesToString(sourceLines));
+            m_Logger.Debug(FeaturesToString(features));
 
-            m_Lines = sourceLines.ToArray();
-            m_Matrix = CreateMatrix(m_Lines);
+            m_Features = features.ToArray();
+            m_Matrix = CreateMatrix(m_Features);
 
             m_Racetracks = m_RacetracksSourceManager.Racetracks;
-        }
-
-        [NotNull]
-        internal double[][] CreateMatrix([NotNull] ILine[] lines)
-        {
-            double[][] matrix = CreateJaggedCostMatrix(lines);
-
-            return matrix;
-        }
-
-        [NotNull]
-        internal double[][] CreateJaggedCostMatrix([NotNull] ILine[] lines)
-        {
-            double[][] matrix = lines.Length == 1
-                                    ? MatrixForOneLine()
-                                    : MatrixForMultipleLines(lines);
-
-            return matrix;
-        }
-
-        [NotNull]
-        internal double[][] MatrixForOneLine()
-        {
-            var matrix = new double[2][];
-
-            matrix [ 0 ] = new[]
-                           {
-                               CostToMyself,
-                               CostToMyself
-                           };
-            matrix [ 1 ] = new[]
-                           {
-                               CostToMyself,
-                               CostToMyself
-                           };
-
-            return matrix;
-        }
-
-        [NotNull]
-        internal ILineToLinesConverter[] CreateLinesToLines([NotNull] ILine[] lines)
-        {
-            int size = lines.Length;
-            var linesToLines = new ILineToLinesConverter[size];
-
-            for ( var i = 0 ; i < lines.Length ; i++ )
-            {
-                var lineToLines = m_ConverterFactory.Create <ILineToLinesConverter>();
-                lineToLines.Racetracks = m_RacetracksSourceManager.Racetracks;
-                lineToLines.Lines = lines;
-                lineToLines.Line = lines [ i ];
-                lineToLines.Convert();
-
-                linesToLines [ i ] = lineToLines;
-            }
-
-            return linesToLines;
-        }
-
-        [NotNull]
-        internal double[][] MatrixForMultipleLines([NotNull] ILine[] lines)
-        {
-            int size = lines.Length * 2;
-            var matrix = new double[size][];
-            ILineToLinesConverter[] converters = CreateLinesToLines(lines);
-
-            var matrixLine = 0;
-
-            for ( var i = 0 ; i < lines.Length ; i++ )
-            {
-                ILineToLinesConverter fromLineToLines = converters [ i ];
-
-                matrix [ matrixLine++ ] = MatrixLineForForward(fromLineToLines,
-                                                               lines);
-                matrix [ matrixLine++ ] = MatrixLineForRevers(fromLineToLines,
-                                                              lines);
-            }
-
-            foreach ( ILineToLinesConverter converter in converters )
-            {
-                m_ConverterFactory.Release(converter);
-            }
-
-            return matrix;
-        }
-
-        [NotNull]
-        internal double[] MatrixLineForRevers([NotNull] ILineToLinesConverter from,
-                                              [NotNull] ICollection <ILine> lines)
-        {
-            var matrixRow = new double[lines.Count * 2];
-
-            var matrixColumn = 0;
-
-            foreach ( ILine toLine in lines )
-            {
-                double costStartToStart = from.CostStartToStart(toLine);
-                matrixRow [ matrixColumn++ ] = costStartToStart;
-
-                double costStartToEnd = from.CostStartToEnd(toLine);
-                matrixRow [ matrixColumn++ ] = costStartToEnd;
-            }
-
-            return matrixRow;
-        }
-
-        [NotNull]
-        internal double[] MatrixLineForForward([NotNull] ILineToLinesConverter from,
-                                               [NotNull] ICollection <ILine> lines)
-        {
-            var matrixRow = new double[lines.Count * 2];
-
-            var matrixColumn = 0;
-
-            foreach ( ILine toLine in lines )
-            {
-                double costEndToStart = from.CostEndToStart(toLine);
-                matrixRow [ matrixColumn++ ] = costEndToStart;
-
-                double costEndToEnd = from.CostEndToEnd(toLine);
-                matrixRow [ matrixColumn++ ] = costEndToEnd;
-            }
-
-            return matrixRow;
         }
 
         public override string ToString()
@@ -229,17 +105,141 @@ namespace Selkie.Services.Racetracks
             return builder.ToString();
         }
 
-        private string LinesToString([NotNull] IEnumerable <ILine> lines)
+        [NotNull]
+        internal ISurveyFeatureToSurveyFeaturesConverter[] CreateFeaturesToFeatures([NotNull] ISurveyFeature[] features)
+        {
+            int size = features.Length;
+            var featuresToFeatures = new ISurveyFeatureToSurveyFeaturesConverter[size];
+
+            for ( var i = 0 ; i < features.Length ; i++ )
+            {
+                var featureToFeatures = m_ConverterFactory.Create <ISurveyFeatureToSurveyFeaturesConverter>();
+                featureToFeatures.Racetracks = m_RacetracksSourceManager.Racetracks;
+                featureToFeatures.Features = features;
+                featureToFeatures.Feature = features [ i ];
+                featureToFeatures.Convert();
+
+                featuresToFeatures [ i ] = featureToFeatures;
+            }
+
+            return featuresToFeatures;
+        }
+
+        [NotNull]
+        internal double[][] CreateJaggedCostMatrix([NotNull] ISurveyFeature[] features)
+        {
+            double[][] matrix = features.Length == 1
+                                    ? MatrixForOneFeature()
+                                    : MatrixForMultipleFeatures(features);
+
+            return matrix;
+        }
+
+        [NotNull]
+        internal double[][] CreateMatrix([NotNull] ISurveyFeature[] features)
+        {
+            double[][] matrix = CreateJaggedCostMatrix(features);
+
+            return matrix;
+        }
+
+        [NotNull]
+        internal double[] MatrixFeatureForForward([NotNull] ISurveyFeatureToSurveyFeaturesConverter from,
+                                                  [NotNull] ICollection <ISurveyFeature> features)
+        {
+            var matrixRow = new double[features.Count * 2];
+
+            var matrixColumn = 0;
+
+            foreach ( ISurveyFeature toFeature in features )
+            {
+                double costEndToStart = from.CostEndToStart(toFeature);
+                matrixRow [ matrixColumn++ ] = costEndToStart;
+
+                double costEndToEnd = from.CostEndToEnd(toFeature);
+                matrixRow [ matrixColumn++ ] = costEndToEnd;
+            }
+
+            return matrixRow;
+        }
+
+        [NotNull]
+        internal double[] MatrixFeatureForRevers([NotNull] ISurveyFeatureToSurveyFeaturesConverter from,
+                                                 [NotNull] ICollection <ISurveyFeature> features)
+        {
+            var matrixRow = new double[features.Count * 2];
+
+            var matrixColumn = 0;
+
+            foreach ( ISurveyFeature toFeature in features )
+            {
+                double costStartToStart = from.CostStartToStart(toFeature);
+                matrixRow [ matrixColumn++ ] = costStartToStart;
+
+                double costStartToEnd = from.CostStartToEnd(toFeature);
+                matrixRow [ matrixColumn++ ] = costStartToEnd;
+            }
+
+            return matrixRow;
+        }
+
+        [NotNull]
+        internal double[][] MatrixForMultipleFeatures([NotNull] ISurveyFeature[] features)
+        {
+            int size = features.Length * 2;
+            var matrix = new double[size][];
+            ISurveyFeatureToSurveyFeaturesConverter[] converters = CreateFeaturesToFeatures(features);
+
+            var matrixLine = 0;
+
+            for ( var i = 0 ; i < features.Length ; i++ )
+            {
+                ISurveyFeatureToSurveyFeaturesConverter fromSurveyFeatureToSurveyFeatures = converters [ i ];
+
+                matrix [ matrixLine++ ] = MatrixFeatureForForward(fromSurveyFeatureToSurveyFeatures,
+                                                                  features);
+                matrix [ matrixLine++ ] = MatrixFeatureForRevers(fromSurveyFeatureToSurveyFeatures,
+                                                                 features);
+            }
+
+            foreach ( ISurveyFeatureToSurveyFeaturesConverter converter in converters )
+            {
+                m_ConverterFactory.Release(converter);
+            }
+
+            return matrix;
+        }
+
+        [NotNull]
+        internal double[][] MatrixForOneFeature()
+        {
+            var matrix = new double[2][];
+
+            matrix [ 0 ] = new[]
+                           {
+                               CostToMyself,
+                               CostToMyself
+                           };
+            matrix [ 1 ] = new[]
+                           {
+                               CostToMyself,
+                               CostToMyself
+                           };
+
+            return matrix;
+        }
+
+        private string FeaturesToString([NotNull] IEnumerable <ISurveyFeature> features)
         {
             // todo testing
-            IEnumerable <ILine> enumerable = lines as ILine[] ?? lines.ToArray();
+            IEnumerable <ISurveyFeature> enumerable = features as ISurveyFeature[] ?? features.ToArray();
 
             var builder = new StringBuilder();
-            builder.AppendLine("Line count: {0}".Inject(enumerable.Count()));
+            builder.AppendLine("Feature count: {0}".Inject(enumerable.Count()));
 
-            foreach ( ILine line in enumerable )
+            foreach ( ISurveyFeature feature in enumerable )
             {
-                builder.AppendLine(line.ToString());
+                builder.AppendLine(feature.ToString());
             }
 
             return builder.ToString();

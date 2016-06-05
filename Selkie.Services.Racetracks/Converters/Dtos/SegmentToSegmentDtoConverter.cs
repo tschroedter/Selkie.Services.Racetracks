@@ -8,17 +8,17 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
 {
     public class SegmentToSegmentDtoConverter : ISegmentToSegmentDtoConverter
     {
-        private readonly IArcSegmentToArcSergmentDtoConverter m_ArcSegmentToArcSergmentDto;
-        private readonly ILineToLineSegmentDtoConverter m_LineToLineSegmentDto;
-        private SegmentDto m_Dto = new SegmentDto();
-        private IPolylineSegment m_Segment = Line.Unknown;
-
         public SegmentToSegmentDtoConverter([NotNull] IArcSegmentToArcSergmentDtoConverter arcSegmentToArcSergmentDto,
                                             [NotNull] ILineToLineSegmentDtoConverter lineToLineSegmentDto)
         {
             m_ArcSegmentToArcSergmentDto = arcSegmentToArcSergmentDto;
             m_LineToLineSegmentDto = lineToLineSegmentDto;
         }
+
+        private readonly IArcSegmentToArcSergmentDtoConverter m_ArcSegmentToArcSergmentDto;
+        private readonly ILineToLineSegmentDtoConverter m_LineToLineSegmentDto;
+        private SegmentDto m_Dto = new SegmentDto();
+        private IPolylineSegment m_Segment = Line.Unknown;
 
         public IPolylineSegment Segment
         {
@@ -52,21 +52,12 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
 
             var lineSegment = m_Segment as ILine;
 
-            if ( lineSegment != null )
+            if ( lineSegment == null )
             {
-                m_Dto = CreateLineSegmentDto(lineSegment);
-                return;
+                throw new ArgumentException("Unknown IPolylineSegment: " + m_Segment.GetType().FullName);
             }
 
-            throw new ArgumentException("Unknown IPolylineSegment: " + m_Segment.GetType().FullName);
-        }
-
-        private LineSegmentDto CreateLineSegmentDto(ILine line)
-        {
-            m_LineToLineSegmentDto.Line = line;
-            m_LineToLineSegmentDto.Convert();
-
-            return m_LineToLineSegmentDto.Dto;
+            m_Dto = CreateLineSegmentDto(lineSegment);
         }
 
         private ArcSegmentDto CreateArcSergmentDto(IArcSegment arcSegment)
@@ -75,6 +66,14 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
             m_ArcSegmentToArcSergmentDto.Convert();
 
             return m_ArcSegmentToArcSergmentDto.Dto;
+        }
+
+        private LineSegmentDto CreateLineSegmentDto(ILine line)
+        {
+            m_LineToLineSegmentDto.Line = line;
+            m_LineToLineSegmentDto.Convert();
+
+            return m_LineToLineSegmentDto.Dto;
         }
     }
 }

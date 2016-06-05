@@ -7,17 +7,17 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
 {
     public class ArcSegmentToArcSegmentDtoConverter : IArcSegmentToArcSergmentDtoConverter
     {
-        private readonly ICircleToCircleDtoConverter m_CircleToCircleDto;
-        private readonly IPointToPointDtoConverter m_PointToPointDto;
-        private IArcSegment m_ArcSegment = Geometry.Shapes.ArcSegment.Unknown;
-        private ArcSegmentDto m_Dto = new ArcSegmentDto();
-
         public ArcSegmentToArcSegmentDtoConverter([NotNull] IPointToPointDtoConverter pointToPointDto,
                                                   [NotNull] ICircleToCircleDtoConverter circleToCircleDto)
         {
             m_PointToPointDto = pointToPointDto;
             m_CircleToCircleDto = circleToCircleDto;
         }
+
+        private readonly ICircleToCircleDtoConverter m_CircleToCircleDto;
+        private readonly IPointToPointDtoConverter m_PointToPointDto;
+        private IArcSegment m_ArcSegment = Geometry.Shapes.ArcSegment.Unknown;
+        private ArcSegmentDto m_Dto = new ArcSegmentDto();
 
         public IArcSegment ArcSegment
         {
@@ -52,20 +52,20 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
                     };
         }
 
-        private PointDto CreatePointDto([NotNull] Point point)
-        {
-            m_PointToPointDto.Point = point;
-            m_PointToPointDto.Convert();
-
-            return m_PointToPointDto.Dto;
-        }
-
         private CircleDto CreateCircleDto([NotNull] ICircle circle)
         {
             m_CircleToCircleDto.Circle = circle;
             m_CircleToCircleDto.Convert();
 
             return m_CircleToCircleDto.Dto;
+        }
+
+        private PointDto CreatePointDto([NotNull] Point point)
+        {
+            m_PointToPointDto.Point = point;
+            m_PointToPointDto.Convert();
+
+            return m_PointToPointDto.Dto;
         }
     }
 }

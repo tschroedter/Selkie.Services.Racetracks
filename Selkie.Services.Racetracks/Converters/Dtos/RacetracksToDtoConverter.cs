@@ -11,12 +11,12 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
     [ProjectComponent(Lifestyle.Transient)]
     public class RacetracksToDtoConverter : IRacetracksToDtoConverter
     {
-        private readonly IPathToPathDtoConverter m_PathToPathDto;
-
         public RacetracksToDtoConverter([NotNull] IPathToPathDtoConverter pathToPathDto)
         {
             m_PathToPathDto = pathToPathDto;
         }
+
+        private readonly IPathToPathDtoConverter m_PathToPathDto;
 
         public RacetracksDto ConvertPaths(IRacetracks racetracks)
         {

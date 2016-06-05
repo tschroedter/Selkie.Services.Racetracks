@@ -9,7 +9,7 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
 {
     public partial class ServiceHandlers
     {
-        public void SubscribeOther()
+        private void SubscribeOther()
         {
             m_Bus.SubscribeAsync <CostMatrixResponseMessage>(GetType().FullName,
                                                              CostMatrixResponseHandler);

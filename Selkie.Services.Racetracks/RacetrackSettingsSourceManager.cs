@@ -9,19 +9,19 @@ using Selkie.Windsor.Extensions;
 namespace Selkie.Services.Racetracks
 {
     // todo move message handlers into separate classes, check all other classes as well
-    [Interceptor(typeof ( MessageHandlerAspect ))]
+    [Interceptor(typeof( MessageHandlerAspect ))]
     [ProjectComponent(Lifestyle.Singleton)]
     public class RacetrackSettingsSourceManager
         : IRacetrackSettingsSourceManager,
           IStartable
     {
-        private readonly ISelkieLogger m_Logger;
-        private IRacetrackSettingsSource m_Source = RacetrackSettingsSource.Default;
-
         public RacetrackSettingsSourceManager([NotNull] ISelkieLogger logger)
         {
             m_Logger = logger;
         }
+
+        private readonly ISelkieLogger m_Logger;
+        private IRacetrackSettingsSource m_Source = RacetrackSettingsSource.Default;
 
         public IRacetrackSettingsSource Source
         {
@@ -59,14 +59,16 @@ namespace Selkie.Services.Racetracks
                                             "settings");
             }
 
-            if ( settings.TurnRadiusForStarboard <= 0.0 )
+            if ( !( settings.TurnRadiusForStarboard <= 0.0 ) )
             {
-                string text = "Turn radius for starboard turn in meters is '{0}' " +
-                              "but it can't be 0 or negative!".Inject(settings.TurnRadiusForStarboard);
-
-                throw new ArgumentException(text,
-                                            "settings");
+                return;
             }
+
+            string message = "Turn radius for starboard turn in meters is '{0}' " +
+                             "but it can't be 0 or negative!".Inject(settings.TurnRadiusForStarboard);
+
+            throw new ArgumentException(message,
+                                        "settings");
         }
 
         private void HandleValidRacetrackSettingsMessage([NotNull] RacetrackSettings settings)

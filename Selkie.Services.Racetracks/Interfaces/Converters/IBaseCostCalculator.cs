@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Selkie.Geometry.Shapes;
+using Selkie.Geometry.Surveying;
 using Selkie.Racetrack.Interfaces;
 using Selkie.Racetrack.Interfaces.Calculators;
 
@@ -12,10 +12,10 @@ namespace Selkie.Services.Racetracks.Interfaces.Converters
         Dictionary <int, double> Costs { get; }
 
         [NotNull]
-        ILine Line { get; set; }
+        ISurveyFeature Feature { get; set; }
 
         [NotNull]
-        IEnumerable <ILine> Lines { get; set; }
+        IEnumerable <ISurveyFeature> Features { get; set; }
 
         [NotNull]
         IRacetracks Racetracks { get; set; }

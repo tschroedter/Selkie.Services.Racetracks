@@ -14,10 +14,10 @@ namespace Selkie.Services.Racetracks.Converters
         {
         }
 
-        internal override double CalculateRacetrackCost(int fromLineId,
-                                                        int toLineId)
+        internal override double CalculateRacetrackCost(int fromFeatureId,
+                                                        int toFeatureId)
         {
-            IPath path = Racetracks.ReverseToReverse [ fromLineId ] [ toLineId ];
+            IPath path = Racetracks.ReverseToReverse [ fromFeatureId ] [ toFeatureId ];
 
             return path.Distance.Length;
         }

@@ -7,14 +7,14 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
 {
     public class CircleToCircleDtoConverter : ICircleToCircleDtoConverter
     {
-        private readonly IPointToPointDtoConverter m_PointToPointDto;
-        private ICircle m_Circle = Geometry.Shapes.Circle.Unknown;
-        private CircleDto m_Dto = new CircleDto();
-
         public CircleToCircleDtoConverter([NotNull] IPointToPointDtoConverter pointToPointDto)
         {
             m_PointToPointDto = pointToPointDto;
         }
+
+        private readonly IPointToPointDtoConverter m_PointToPointDto;
+        private ICircle m_Circle = Geometry.Shapes.Circle.Unknown;
+        private CircleDto m_Dto = new CircleDto();
 
         [NotNull]
         public ICircle Circle

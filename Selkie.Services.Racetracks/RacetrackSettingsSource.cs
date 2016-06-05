@@ -4,13 +4,6 @@ namespace Selkie.Services.Racetracks
 {
     public class RacetrackSettingsSource : IRacetrackSettingsSource
     {
-        internal static readonly double DefaultRadius = 60.0;
-
-        public static readonly RacetrackSettingsSource Default = new RacetrackSettingsSource(DefaultRadius,
-                                                                                             DefaultRadius,
-                                                                                             true,
-                                                                                             true);
-
         public RacetrackSettingsSource(double turnRadiusForPort,
                                        double turnRadiusForStarboard,
                                        bool isPortTurnAllowed,
@@ -21,6 +14,13 @@ namespace Selkie.Services.Racetracks
             IsPortTurnAllowed = isPortTurnAllowed;
             IsStarboardTurnAllowed = isStarboardTurnAllowed;
         }
+
+        internal static readonly double DefaultRadius = 60.0;
+
+        public static readonly RacetrackSettingsSource Default = new RacetrackSettingsSource(DefaultRadius,
+                                                                                             DefaultRadius,
+                                                                                             true,
+                                                                                             true);
 
         public double TurnRadiusForStarboard { get; private set; }
 

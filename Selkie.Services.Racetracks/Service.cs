@@ -9,14 +9,12 @@ using IService = Selkie.Services.Racetracks.Interfaces.IService;
 
 namespace Selkie.Services.Racetracks
 {
-    [Interceptor(typeof ( MessageHandlerAspect ))]
+    [Interceptor(typeof( MessageHandlerAspect ))]
     [ProjectComponent(Lifestyle.Singleton)]
     public class Service
         : BaseService,
           IService
     {
-        public const string ServiceName = "Racetracks Service";
-
         public Service([NotNull] ISelkieBus bus,
                        [NotNull] ISelkieLogger logger,
                        [NotNull] ISelkieManagementClient client)
@@ -24,6 +22,12 @@ namespace Selkie.Services.Racetracks
                    logger,
                    client,
                    ServiceName)
+        {
+        }
+
+        public const string ServiceName = "Racetracks Service";
+
+        protected override void ServiceInitialize()
         {
         }
 
@@ -45,10 +49,6 @@ namespace Selkie.Services.Racetracks
                           };
 
             Bus.Publish(message);
-        }
-
-        protected override void ServiceInitialize()
-        {
         }
     }
 }

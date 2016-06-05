@@ -6,7 +6,6 @@ using Selkie.Services.Common;
 namespace Selkie.Services.Racetracks.Console
 {
     [ExcludeFromCodeCoverage]
-    //ncrunch: no coverage start
     public class Program : ServiceMain
     {
         public static void Main()

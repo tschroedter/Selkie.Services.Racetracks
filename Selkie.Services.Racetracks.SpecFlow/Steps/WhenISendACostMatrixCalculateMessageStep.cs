@@ -11,11 +11,11 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps
         [When(@"I send a CostMatrixCalculateMessage")]
         public override void Do()
         {
-            LineDto[] lineDtos = CreateLineDtos();
+            SurveyFeatureDto[] lineDtos = CreateSurveyFeatureDtos();
 
             var message = new CostMatrixCalculateMessage
                           {
-                              LineDtos = lineDtos,
+                              SurveyFeatureDtos = lineDtos,
                               TurnRadiusForPort = 100.0,
                               TurnRadiusForStarboard = 200.0,
                               IsPortTurnAllowed = true,
@@ -26,34 +26,52 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps
         }
 
         [NotNull]
-        private LineDto[] CreateLineDtos()
+        private SurveyFeatureDto[] CreateSurveyFeatureDtos()
         {
-            var lineOne = new LineDto
-                          {
-                              Id = 0,
-                              RunDirection = "Forward",
-                              IsUnknown = false,
-                              X1 = 0.0,
-                              Y1 = 0.0,
-                              X2 = 0.0,
-                              Y2 = 100.0
-                          };
+            var dto = new SurveyFeatureDto
+                      {
+                          Id = 0,
+                          RunDirection = "Forward",
+                          IsUnknown = false,
+                          StartPoint = new PointDto
+                                       {
+                                           X = 0.0,
+                                           Y = 0.0
+                                       },
+                          EndPoint = new PointDto
+                                     {
+                                         X = 0.0,
+                                         Y = 100.0
+                                     },
+                          AngleToXAxisAtStartPoint = 90.0,
+                          AngleToXAxisAtEndPoint = 90.0,
+                          Length = 100.0
+                      };
 
-            var lineTwo = new LineDto
-                          {
-                              Id = 1,
-                              RunDirection = "Forward",
-                              IsUnknown = false,
-                              X1 = 100.0,
-                              Y1 = 0.0,
-                              X2 = 100.0,
-                              Y2 = 100.0
-                          };
+            var two = new SurveyFeatureDto
+                      {
+                          Id = 1,
+                          RunDirection = "Forward",
+                          IsUnknown = false,
+                          StartPoint = new PointDto
+                                       {
+                                           X = 100.0,
+                                           Y = 0.0
+                                       },
+                          EndPoint = new PointDto
+                                     {
+                                         X = 100.0,
+                                         Y = 100.0
+                                     },
+                          AngleToXAxisAtStartPoint = 270.0,
+                          AngleToXAxisAtEndPoint = 270.0,
+                          Length = 100.0
+                      };
 
-            LineDto[] dtos =
+            SurveyFeatureDto[] dtos =
             {
-                lineOne,
-                lineTwo
+                dto,
+                two
             };
 
             return dtos;

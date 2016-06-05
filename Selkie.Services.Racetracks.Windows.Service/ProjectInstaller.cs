@@ -28,6 +28,21 @@ namespace Selkie.Services.Racetracks.Windows.Service
             serviceInstaller1.ServiceName += " " + version;
         }
 
+        private static void ReplacePermissions(string filepath,
+                                               WellKnownSidType sidType,
+                                               FileSystemRights allow)
+        {
+            FileSecurity sec = File.GetAccessControl(filepath);
+            var sid = new SecurityIdentifier(sidType,
+                                             null);
+            sec.PurgeAccessRules(sid); //remove existing
+            sec.AddAccessRule(new FileSystemAccessRule(sid,
+                                                       allow,
+                                                       AccessControlType.Allow));
+            File.SetAccessControl(filepath,
+                                  sec);
+        }
+
         private void serviceProcessInstaller1_AfterInstall(object sender,
                                                            InstallEventArgs e)
         {
@@ -46,21 +61,6 @@ namespace Selkie.Services.Racetracks.Windows.Service
             ReplacePermissions(logPath,
                                WellKnownSidType.LocalServiceSid,
                                FileSystemRights.FullControl);
-        }
-
-        private static void ReplacePermissions(string filepath,
-                                               WellKnownSidType sidType,
-                                               FileSystemRights allow)
-        {
-            FileSecurity sec = File.GetAccessControl(filepath);
-            var sid = new SecurityIdentifier(sidType,
-                                             null);
-            sec.PurgeAccessRules(sid); //remove existing
-            sec.AddAccessRule(new FileSystemAccessRule(sid,
-                                                       allow,
-                                                       AccessControlType.Allow));
-            File.SetAccessControl(filepath,
-                                  sec);
         }
     }
 }

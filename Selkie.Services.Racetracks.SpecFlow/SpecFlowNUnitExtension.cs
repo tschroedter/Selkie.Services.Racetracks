@@ -17,6 +17,7 @@ using NUnit.Core;
 using NUnit.Core.Extensibility;
 
 // ReSharper disable All
+
 namespace TechTalk.SpecFlow
 {
     [NUnitAddin(Type = ExtensionType.Core, Name = "SpecFlow")]

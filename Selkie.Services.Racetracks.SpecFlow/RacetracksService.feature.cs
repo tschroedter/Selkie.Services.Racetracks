@@ -37,7 +37,7 @@ namespace Selkie.Services.Racetracks.SpecFlow
 
         private static TechTalk.SpecFlow.ITestRunner testRunner;
 
-        [NUnit.Framework.TestFixtureSetUpAttribute()]
+        [NUnit.Framework.OneTimeSetUpAttribute]
         public virtual void FeatureSetup()
         {
             testRunner = TechTalk.SpecFlow.TestRunnerManager.GetTestRunner();
@@ -49,7 +49,7 @@ namespace Selkie.Services.Racetracks.SpecFlow
             testRunner.OnFeatureStart(featureInfo);
         }
 
-        [NUnit.Framework.TestFixtureTearDownAttribute()]
+        [NUnit.Framework.OneTimeTearDownAttribute]
         public virtual void FeatureTearDown()
         {
             testRunner.OnFeatureEnd();

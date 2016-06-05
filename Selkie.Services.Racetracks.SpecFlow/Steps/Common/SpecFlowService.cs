@@ -17,43 +17,19 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
             m_ExeProcess.Exited -= ExeProcessOnExited;
         }
 
-        public void Run()
+        public void DeleteQueues()
         {
-            m_ExeProcess = StartService();
+            var client = new ManagementClient("http://localhost",
+                                              "selkieAdmin",
+                                              "selkieAdmin");
 
-            if ( m_ExeProcess == null )
+            foreach ( Queue queue in client.GetQueues() )
             {
-                throw new InstanceNotFoundException("Could not start service!");
+                if ( queue.Vhost == "selkie" )
+                {
+                    client.DeleteQueue(queue);
+                }
             }
-
-            ScenarioContext.Current [ "ExeProcess" ] = m_ExeProcess;
-            ScenarioContext.Current [ "IsExited" ] = false;
-
-            m_ExeProcess.Exited += ExeProcessOnExited;
-        }
-
-        [CanBeNull]
-        private Process StartService()
-        {
-            var startInfo = new ProcessStartInfo
-                            {
-                                WorkingDirectory = Helper.WorkingFolder,
-                                CreateNoWindow = false,
-                                UseShellExecute = false,
-                                FileName = Helper.FilenName,
-                                WindowStyle = ProcessWindowStyle.Normal,
-                                Arguments = ""
-                            };
-
-            Process lineService = Process.Start(startInfo);
-
-            return lineService;
-        }
-
-        private void ExeProcessOnExited([NotNull] object sender,
-                                        [NotNull] EventArgs eventArgs)
-        {
-            ScenarioContext.Current [ "IsExited" ] = true;
         }
 
         public void KillAndWaitForExit()
@@ -74,19 +50,50 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
             }
         }
 
-        public void DeleteQueues()
+        public void Run()
         {
-            var client = new ManagementClient("http://localhost",
-                                              "selkieAdmin",
-                                              "selkieAdmin");
+            m_ExeProcess = StartService();
 
-            foreach ( Queue queue in client.GetQueues() )
+            if ( m_ExeProcess == null )
             {
-                if ( queue.Vhost == "selkie" )
-                {
-                    client.DeleteQueue(queue);
-                }
+                throw new InstanceNotFoundException("Could not start service!");
             }
+
+            ScenarioContext.Current [ "ExeProcess" ] = m_ExeProcess;
+            ScenarioContext.Current [ "IsExited" ] = false;
+
+            m_ExeProcess.Exited += ExeProcessOnExited;
+        }
+
+        private void ExeProcessOnExited([NotNull] object sender,
+                                        [NotNull] EventArgs eventArgs)
+        {
+            ScenarioContext.Current [ "IsExited" ] = true;
+        }
+
+        [CanBeNull]
+        private Process StartService()
+        {
+            string directoryName = Helper.GetDirectoryName();
+
+            string fullName = Helper.FullnameForServiceName(directoryName,
+                                                            Helper.ExeFilenName);
+
+            string workingFolder = Helper.GetWorkingFolder(fullName);
+
+            var startInfo = new ProcessStartInfo
+                            {
+                                WorkingDirectory = workingFolder,
+                                CreateNoWindow = false,
+                                UseShellExecute = false,
+                                FileName = fullName,
+                                WindowStyle = ProcessWindowStyle.Normal,
+                                Arguments = ""
+                            };
+
+            Process lineService = Process.Start(startInfo);
+
+            return lineService;
         }
     }
 }

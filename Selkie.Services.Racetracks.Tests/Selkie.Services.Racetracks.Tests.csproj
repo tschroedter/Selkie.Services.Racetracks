@@ -54,8 +54,8 @@
       <HintPath>..\packages\EasyNetQ.Management.Client.0.47.12.38\lib\net40\EasyNetQ.Management.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="JetBrains.Annotations, Version=10.0.0.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
-      <HintPath>..\packages\JetBrains.Annotations.10.0.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    <Reference Include="JetBrains.Annotations, Version=10.1.4.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.10.1.4\lib\net20\JetBrains.Annotations.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
@@ -66,68 +66,60 @@
       <HintPath>..\packages\NLog.4.1.0\lib\net45\NLog.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NSubstitute, Version=1.8.2.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
-      <HintPath>..\packages\NSubstitute.1.8.2.0\lib\net45\NSubstitute.dll</HintPath>
+    <Reference Include="NSubstitute, Version=1.10.0.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\NSubstitute.1.10.0.0\lib\net45\NSubstitute.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.6.4.14350, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+    <Reference Include="Ploeh.AutoFixture, Version=3.46.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.3.46.0\lib\net40\Ploeh.AutoFixture.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ploeh.AutoFixture, Version=3.31.3.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.3.31.3\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+    <Reference Include="Ploeh.AutoFixture.AutoNSubstitute, Version=3.46.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.AutoNSubstitute.3.46.0\lib\net40\Ploeh.AutoFixture.AutoNSubstitute.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Ploeh.AutoFixture.AutoNSubstitute, Version=3.31.1.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.AutoNSubstitute.3.31.1\lib\net40\Ploeh.AutoFixture.AutoNSubstitute.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Ploeh.AutoFixture.Xunit, Version=3.31.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.Xunit.3.31.0\lib\net40\Ploeh.AutoFixture.Xunit.dll</HintPath>
+    <Reference Include="Ploeh.AutoFixture.Xunit, Version=3.45.1.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.Xunit.3.45.1\lib\net40\Ploeh.AutoFixture.Xunit.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="RabbitMQ.Client, Version=3.5.4.0, Culture=neutral, PublicKeyToken=89e7d7c5feba84ce, processorArchitecture=MSIL">
       <HintPath>..\packages\RabbitMQ.Client.3.5.4\lib\net40\RabbitMQ.Client.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Common, Version=0.6.232.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Common.0.6.232.0\lib\net45\Selkie.Common.dll</HintPath>
+    <Reference Include="Selkie.Common, Version=0.6.254.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Common.0.6.254\lib\net45\Selkie.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.EasyNetQ, Version=0.6.220.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.EasyNetQ.0.6.220.0\lib\net45\Selkie.EasyNetQ.dll</HintPath>
+    <Reference Include="Selkie.EasyNetQ, Version=0.6.246.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.EasyNetQ.0.6.246\lib\net45\Selkie.EasyNetQ.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Geometry, Version=0.6.141.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Geometry.0.6.141.0\lib\net45\Selkie.Geometry.dll</HintPath>
+    <Reference Include="Selkie.Geometry, Version=0.6.170.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Geometry.0.6.170.0\lib\net45\Selkie.Geometry.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.NUnit.Extensions, Version=0.6.113.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.NUnit.Extensions.0.6.113.0\lib\net45\Selkie.NUnit.Extensions.dll</HintPath>
+    <Reference Include="Selkie.Racetrack, Version=0.6.181.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Racetrack.0.6.181.0\lib\net45\Selkie.Racetrack.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Racetrack, Version=0.6.157.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Racetrack.0.6.157.0\lib\net45\Selkie.Racetrack.dll</HintPath>
+    <Reference Include="Selkie.Services.Common, Version=0.6.223.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Services.Common.0.6.223.0\lib\net45\Selkie.Services.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Services.Common, Version=0.6.187.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Services.Common.0.6.187.0\lib\net45\Selkie.Services.Common.dll</HintPath>
+    <Reference Include="Selkie.Services.Common.Dto, Version=0.6.22.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Services.Common.Dto.0.6.22\lib\net45\Selkie.Services.Common.Dto.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Services.Common.Dto, Version=0.6.17.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Services.Common.Dto.0.6.17.0\lib\net45\Selkie.Services.Common.Dto.dll</HintPath>
+    <Reference Include="Selkie.Services.Racetracks.Common, Version=0.6.74.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Services.Racetracks.Common.0.6.74.0\lib\net45\Selkie.Services.Racetracks.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Services.Racetracks.Common, Version=0.6.72.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Services.Racetracks.Common.0.6.72.0\lib\net45\Selkie.Services.Racetracks.Common.dll</HintPath>
+    <Reference Include="Selkie.Windsor, Version=0.6.261.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.Windsor.0.6.261\lib\net45\Selkie.Windsor.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Selkie.Windsor, Version=0.6.257.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.Windsor.0.6.257.0\lib\net45\Selkie.Windsor.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Selkie.XUnit.Extensions, Version=0.6.115.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Selkie.XUnit.Extensions.0.6.115.0\lib\net45\Selkie.XUnit.Extensions.dll</HintPath>
+    <Reference Include="Selkie.XUnit.Extensions, Version=0.6.129.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Selkie.XUnit.Extensions.0.6.129\lib\net45\Selkie.XUnit.Extensions.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -147,31 +139,31 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Converters\Dtos\XUnit\ArcSegmentToArcSergmentDtoConverterTests.cs" />
-    <Compile Include="Converters\Dtos\XUnit\CircleToCircleDtoConverterTests.cs" />
-    <Compile Include="Converters\Dtos\XUnit\DtoHelper.cs" />
-    <Compile Include="Converters\Dtos\XUnit\LineToLineSegmentDtoConverterTests.cs" />
-    <Compile Include="Converters\Dtos\XUnit\PathToPathDtoConverterTests.cs" />
-    <Compile Include="Converters\Dtos\XUnit\PointToPointDtoConverterTests.cs" />
-    <Compile Include="Converters\Dtos\XUnit\PolylineToPolylineDtoConverterTests.cs" />
-    <Compile Include="Converters\Dtos\XUnit\SegmentToSegmentDtoConverterTests.cs" />
-    <Compile Include="Converters\NUnit\BaseCostCalculatorTests.cs" />
-    <Compile Include="Converters\NUnit\CostEndToEndCalculatorTests.cs" />
-    <Compile Include="Converters\NUnit\CostEndToStartCalculatorTests.cs" />
-    <Compile Include="Converters\NUnit\CostStartToEndCalculatorTests.cs" />
-    <Compile Include="Converters\NUnit\CostStartToStartCalculatorTests.cs" />
-    <Compile Include="Converters\NUnit\LineToLinesConverterTests.cs" />
-    <Compile Include="Converters\XUnit\RacetracksTests.cs" />
-    <Compile Include="NUnit\CostMatrixTests.cs" />
-    <Compile Include="NUnit\RacetrackSettingsSourceManagerTests.cs" />
-    <Compile Include="NUnit\RacetrackSettingsSourceTests.cs" />
-    <Compile Include="NUnit\RacetracksSourceManagerTests.cs" />
+    <Compile Include="Converters\Dtos\ArcSegmentToArcSergmentDtoConverterTests.cs" />
+    <Compile Include="Converters\Dtos\CircleToCircleDtoConverterTests.cs" />
+    <Compile Include="Converters\Dtos\DtoHelper.cs" />
+    <Compile Include="Converters\Dtos\LineToLineSegmentDtoConverterTests.cs" />
+    <Compile Include="Converters\Dtos\PathToPathDtoConverterTests.cs" />
+    <Compile Include="Converters\Dtos\PointToPointDtoConverterTests.cs" />
+    <Compile Include="Converters\Dtos\PolylineToPolylineDtoConverterTests.cs" />
+    <Compile Include="Converters\Dtos\SegmentToSegmentDtoConverterTests.cs" />
+    <Compile Include="Converters\BaseCostCalculatorTests.cs" />
+    <Compile Include="Converters\CostEndToEndCalculatorTests.cs" />
+    <Compile Include="Converters\CostEndToStartCalculatorTests.cs" />
+    <Compile Include="Converters\CostStartToEndCalculatorTests.cs" />
+    <Compile Include="Converters\CostStartToStartCalculatorTests.cs" />
+    <Compile Include="Converters\SurveyFeatureToSurveyFeaturesConverterTests.cs" />
+    <Compile Include="Converters\RacetracksTests.cs" />
+    <Compile Include="CostMatrixTests.cs" />
+    <Compile Include="RacetrackSettingsSourceManagerTests.cs" />
+    <Compile Include="RacetrackSettingsSourceTests.cs" />
+    <Compile Include="RacetracksSourceManagerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="XUnit\CostMatrixSourceManagerTests.cs" />
-    <Compile Include="XUnit\LinesSourceManagerTests.cs" />
-    <Compile Include="XUnit\LineToLineDtoConverterTests.cs" />
-    <Compile Include="Converters\Dtos\XUnit\RacetracksToDtoConverterTests.cs" />
-    <Compile Include="XUnit\ServiceTests.cs" />
+    <Compile Include="CostMatrixSourceManagerTests.cs" />
+    <Compile Include="Converters\Dtos\RacetracksToDtoConverterTests.cs" />
+    <Compile Include="ServiceTests.cs" />
+    <Compile Include="SurveyFeaturesSourceManagerTests.cs" />
+    <Compile Include="SurveyFeatureToSurveyFeatureDtoConverterTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Selkie.Services.Racetracks\Selkie.Services.Racetracks.csproj">
@@ -183,6 +175,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

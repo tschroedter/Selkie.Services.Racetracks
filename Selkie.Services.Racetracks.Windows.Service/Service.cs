@@ -12,6 +12,13 @@ namespace Selkie.Services.Racetracks.Windows.Service
     [ExcludeFromCodeCoverage]
     public partial class Service : ServiceBase
     {
+        public Service()
+        {
+            InitializeComponent();
+
+            m_Thread = CreateWorkerThread();
+        }
+
         private readonly RacetracksServiceMain m_Main = new RacetracksServiceMain();
         private readonly ManualResetEvent m_ShutDownEvent = new ManualResetEvent(false);
         private readonly Thread m_Thread;
@@ -19,13 +26,6 @@ namespace Selkie.Services.Racetracks.Windows.Service
         private ISelkieBus m_Bus;
         private IWindsorContainer m_Container;
         private ISelkieLogger m_Logger;
-
-        public Service()
-        {
-            InitializeComponent();
-
-            m_Thread = CreateWorkerThread();
-        }
 
         public void Start()
         {
@@ -49,6 +49,15 @@ namespace Selkie.Services.Racetracks.Windows.Service
             m_Thread.Abort();
         }
 
+        private static IWindsorContainer CreateWindsorContainer()
+        {
+            var container = new WindsorContainer();
+            var installer = new Installer();
+
+            container.Install(installer);
+            return container;
+        }
+
         private Thread CreateWorkerThread()
         {
             var thread = new Thread(() => WorkerThreadFunc(m_Main))
@@ -60,13 +69,11 @@ namespace Selkie.Services.Racetracks.Windows.Service
             return thread;
         }
 
-        private void WorkerThreadFunc([NotNull] RacetracksServiceMain serviceMain)
+        private void InitializeAcoServiceRelatedFields()
         {
-            InitializeAcoServiceRelatedFields();
-
-            serviceMain.Run();
-
-            WaitForShutDownEvent();
+            m_Container = CreateWindsorContainer();
+            m_Logger = m_Container.Resolve <ISelkieLogger>();
+            m_Bus = m_Container.Resolve <ISelkieBus>();
         }
 
         private void WaitForShutDownEvent()
@@ -77,20 +84,13 @@ namespace Selkie.Services.Racetracks.Windows.Service
             }
         }
 
-        private void InitializeAcoServiceRelatedFields()
+        private void WorkerThreadFunc([NotNull] RacetracksServiceMain serviceMain)
         {
-            m_Container = CreateWindsorContainer();
-            m_Logger = m_Container.Resolve <ISelkieLogger>();
-            m_Bus = m_Container.Resolve <ISelkieBus>();
-        }
+            InitializeAcoServiceRelatedFields();
 
-        private static IWindsorContainer CreateWindsorContainer()
-        {
-            var container = new WindsorContainer();
-            var installer = new Installer();
+            serviceMain.Run();
 
-            container.Install(installer);
-            return container;
+            WaitForShutDownEvent();
         }
     }
 }

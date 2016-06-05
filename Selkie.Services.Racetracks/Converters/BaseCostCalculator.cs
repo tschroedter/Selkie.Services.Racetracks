@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using Selkie.Geometry.Shapes;
+using Selkie.Geometry.Surveying;
 using Selkie.Racetrack.Interfaces;
 using Selkie.Services.Racetracks.Interfaces.Converters;
 using Selkie.Windsor;
@@ -8,24 +8,21 @@ using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks.Converters
 {
-    // todo use Fody!!!!
     public abstract class BaseCostCalculator : IBaseCostCalculator
     {
-        protected readonly ISelkieLogger Logger;
-        private readonly object m_Padlock = new object();
-        private Dictionary <int, double> m_Costs = new Dictionary <int, double>();
-        private ILine m_Line = Geometry.Shapes.Line.Unknown;
-
-        private IEnumerable <ILine> m_Lines = new ILine[]
-                                              {
-                                              };
-
-        private IRacetracks m_Racetracks = Dtos.Racetracks.Unknown;
-
         protected BaseCostCalculator([NotNull] ISelkieLogger logger)
         {
             Logger = logger;
         }
+
+        protected readonly ISelkieLogger Logger;
+        private readonly object m_Padlock = new object();
+        private Dictionary <int, double> m_Costs = new Dictionary <int, double>();
+        private ISurveyFeature m_Feature = SurveyFeature.Unknown;
+
+        private IEnumerable <ISurveyFeature> m_Features = new ISurveyFeature[0];
+
+        private IRacetracks m_Racetracks = Dtos.Racetracks.Unknown;
 
         public Dictionary <int, double> Costs
         {
@@ -35,27 +32,27 @@ namespace Selkie.Services.Racetracks.Converters
             }
         }
 
-        public ILine Line
+        public ISurveyFeature Feature
         {
             get
             {
-                return m_Line;
+                return m_Feature;
             }
             set
             {
-                m_Line = value;
+                m_Feature = value;
             }
         }
 
-        public IEnumerable <ILine> Lines
+        public IEnumerable <ISurveyFeature> Features
         {
             get
             {
-                return m_Lines;
+                return m_Features;
             }
             set
             {
-                m_Lines = value;
+                m_Features = value;
             }
         }
 
@@ -79,57 +76,60 @@ namespace Selkie.Services.Racetracks.Converters
             }
         }
 
+        internal abstract double CalculateRacetrackCost(int fromFeatureId,
+                                                        int toFeatureId);
+
+        internal double CheckAndCalculate(int fromFeatureId,
+                                          int toFeatureId)
+        {
+            if ( !IsValidFeatureId(fromFeatureId) )
+            {
+                string message = "fromFeatureId = {0} paths[{1}][]".Inject(fromFeatureId,
+                                                                           m_Racetracks.ForwardToForward.Length);
+                Logger.Warn(message);
+
+                return 0.0;
+            }
+
+            if ( IsValidFeatureId(toFeatureId) )
+            {
+                return CalculateRacetrackCost(fromFeatureId,
+                                              toFeatureId);
+            }
+
+            string text = "toFeatureId = {0} paths[{1}][]".Inject(fromFeatureId,
+                                                                  m_Racetracks.ForwardToForward.Length);
+            Logger.Warn(text);
+
+            return 0.0;
+        }
+
         [NotNull]
         private Dictionary <int, double> CalculateCost()
         {
             var costs = new Dictionary <int, double>();
 
-            foreach ( ILine otherLine in Lines )
+            foreach ( ISurveyFeature otherFeature in Features )
             {
                 double cost = CostMatrix.CostToMyself;
 
-                if ( Line.Id != otherLine.Id )
+                if ( Feature.Id != otherFeature.Id )
                 {
-                    int fromLineId = Line.Id;
-                    int toLineId = otherLine.Id;
+                    int fromFeatureId = Feature.Id;
+                    int toFeatureId = otherFeature.Id;
 
-                    cost = CheckAndCalculate(fromLineId,
-                                             toLineId);
+                    cost = CheckAndCalculate(fromFeatureId,
+                                             toFeatureId);
                 }
 
-                costs.Add(otherLine.Id,
+                costs.Add(otherFeature.Id,
                           cost);
             }
 
             return costs;
         }
 
-        internal double CheckAndCalculate(int fromLineId,
-                                          int toLineId)
-        {
-            if ( !IsValidLineId(fromLineId) )
-            {
-                string message = "fromLineId = {0} paths[{1}][]".Inject(fromLineId,
-                                                                        m_Racetracks.ForwardToForward.Length);
-                Logger.Warn(message);
-
-                return 0.0;
-            }
-
-            if ( !IsValidLineId(toLineId) )
-            {
-                string message = "toLineId = {0} paths[{1}][]".Inject(fromLineId,
-                                                                      m_Racetracks.ForwardToForward.Length);
-                Logger.Warn(message);
-
-                return 0.0;
-            }
-
-            return CalculateRacetrackCost(fromLineId,
-                                          toLineId);
-        }
-
-        private bool IsValidLineId(int lineId)
+        private bool IsValidFeatureId(int lineId)
         {
             int length = m_Racetracks.ForwardToForward.Length;
 
@@ -138,16 +138,7 @@ namespace Selkie.Services.Racetracks.Converters
                 return false;
             }
 
-            if ( lineId < 0 ||
-                 lineId >= length )
-            {
-                return false;
-            }
-
-            return true;
+            return lineId >= 0 && lineId < length;
         }
-
-        internal abstract double CalculateRacetrackCost(int fromLineId,
-                                                        int toLineId);
     }
 }

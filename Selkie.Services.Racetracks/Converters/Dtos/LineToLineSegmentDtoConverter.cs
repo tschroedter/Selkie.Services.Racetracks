@@ -7,14 +7,14 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
 {
     public class LineToLineSegmentDtoConverter : ILineToLineSegmentDtoConverter
     {
-        private readonly IPointToPointDtoConverter m_PointToPointDto;
-        private LineSegmentDto m_Dto = new LineSegmentDto();
-        private ILine m_Line = Geometry.Shapes.Line.Unknown;
-
         public LineToLineSegmentDtoConverter([NotNull] IPointToPointDtoConverter pointToPointDto)
         {
             m_PointToPointDto = pointToPointDto;
         }
+
+        private readonly IPointToPointDtoConverter m_PointToPointDto;
+        private LineSegmentDto m_Dto = new LineSegmentDto();
+        private ILine m_Line = Geometry.Shapes.Line.Unknown;
 
         public ILine Line
         {

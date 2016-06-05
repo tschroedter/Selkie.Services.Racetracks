@@ -8,14 +8,14 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
 {
     public class PolylineToPolylineDtoConverter : IPolylineToPolylineDtoConverter
     {
-        private readonly ISegmentToSegmentDtoConverter m_SegmentToSegmentDto;
-        private PolylineDto m_Dto = new PolylineDto(); // todo add Id to DTO check for direction
-        private IPolyline m_Polyline = Geometry.Shapes.Polyline.Unknown;
-
         public PolylineToPolylineDtoConverter([NotNull] ISegmentToSegmentDtoConverter segmentToSegmentDto)
         {
             m_SegmentToSegmentDto = segmentToSegmentDto;
         }
+
+        private readonly ISegmentToSegmentDtoConverter m_SegmentToSegmentDto;
+        private PolylineDto m_Dto = new PolylineDto(); // todo add Id to DTO check for direction
+        private IPolyline m_Polyline = Geometry.Shapes.Polyline.Unknown;
 
         [NotNull]
         public IPolyline Polyline
@@ -46,14 +46,6 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
                     };
         }
 
-        private SegmentDto CreateSegmentDto([NotNull] IPolylineSegment segment)
-        {
-            m_SegmentToSegmentDto.Segment = segment;
-            m_SegmentToSegmentDto.Convert();
-
-            return m_SegmentToSegmentDto.Dto;
-        }
-
         internal bool IsPolylineAUturn([NotNull] IPolyline polyline)
         {
             if ( !polyline.Segments.Any() ||
@@ -63,6 +55,14 @@ namespace Selkie.Services.Racetracks.Converters.Dtos
             }
 
             return polyline.Segments.ElementAt(1) is IArcSegment;
+        }
+
+        private SegmentDto CreateSegmentDto([NotNull] IPolylineSegment segment)
+        {
+            m_SegmentToSegmentDto.Segment = segment;
+            m_SegmentToSegmentDto.Convert();
+
+            return m_SegmentToSegmentDto.Dto;
         }
     }
 }

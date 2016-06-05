@@ -10,31 +10,22 @@ using Selkie.Windsor.Extensions;
 
 namespace Selkie.Services.Racetracks
 {
-    [Interceptor(typeof ( MessageHandlerAspect ))]
+    [Interceptor(typeof( MessageHandlerAspect ))]
     [ProjectComponent(Lifestyle.Singleton)]
     public class CostMatrixSourceManager
         : ICostMatrixSourceManager,
           IStartable
     {
-        private readonly ISelkieBus m_Bus;
-        private readonly ICostMatrixFactory m_Factory;
-        private readonly ILinesSourceManager m_LinesSourceManager;
-        private readonly ISelkieLogger m_Logger;
-        private readonly object m_Padlock = new object();
-        private readonly IRacetrackSettingsSourceManager m_RacetrackSettingsSourceManager;
-        private readonly IRacetracksSourceManager m_RacetracksSourceManager;
-        private ICostMatrix m_Source = CostMatrix.Unkown;
-
         public CostMatrixSourceManager([NotNull] ISelkieBus bus,
                                        [NotNull] ISelkieLogger logger,
-                                       [NotNull] ILinesSourceManager linesSourceManager,
+                                       [NotNull] ISurveyFeaturesSourceManager surveyFeaturesSourceManager,
                                        [NotNull] IRacetrackSettingsSourceManager racetrackSettingsSourceManager,
                                        [NotNull] IRacetracksSourceManager racetracksSourceManager,
                                        [NotNull] ICostMatrixFactory factory)
         {
             m_Bus = bus;
             m_Logger = logger;
-            m_LinesSourceManager = linesSourceManager;
+            m_SurveyFeaturesSourceManager = surveyFeaturesSourceManager;
             m_RacetrackSettingsSourceManager = racetrackSettingsSourceManager;
             m_RacetracksSourceManager = racetracksSourceManager;
             m_Factory = factory;
@@ -47,6 +38,15 @@ namespace Selkie.Services.Racetracks
             m_Bus.SubscribeAsync <CostMatrixRequestMessage>(subscriptionId,
                                                             CostMatrixGetHandler);
         }
+
+        private readonly ISelkieBus m_Bus;
+        private readonly ICostMatrixFactory m_Factory;
+        private readonly ISelkieLogger m_Logger;
+        private readonly object m_Padlock = new object();
+        private readonly IRacetrackSettingsSourceManager m_RacetrackSettingsSourceManager;
+        private readonly IRacetracksSourceManager m_RacetracksSourceManager;
+        private readonly ISurveyFeaturesSourceManager m_SurveyFeaturesSourceManager;
+        private ICostMatrix m_Source = CostMatrix.Unkown;
 
         public ICostMatrix Source
         {
@@ -76,9 +76,26 @@ namespace Selkie.Services.Racetracks
             UpdateSource();
         }
 
+        internal void CostMatrixGetHandler([NotNull] CostMatrixRequestMessage message)
+        {
+            ICostMatrix costMatrix;
+
+            lock ( m_Padlock )
+            {
+                costMatrix = m_Source;
+            }
+
+            var response = new CostMatrixResponseMessage
+                           {
+                               Matrix = costMatrix.Matrix
+                           };
+
+            m_Bus.PublishAsync(response);
+        }
+
         internal void PreUpdateSource(CostMatrixCalculateMessage message)
         {
-            m_LinesSourceManager.SetLinesIfValid(message.LineDtos);
+            m_SurveyFeaturesSourceManager.SetSurveyFeaturesIfValid(message.SurveyFeatureDtos);
 
             var settings = new RacetrackSettings
                            {
@@ -117,23 +134,6 @@ namespace Selkie.Services.Racetracks
                                {
                                    Matrix = costMatrix.Matrix
                                });
-        }
-
-        internal void CostMatrixGetHandler([NotNull] CostMatrixRequestMessage message)
-        {
-            ICostMatrix costMatrix;
-
-            lock ( m_Padlock )
-            {
-                costMatrix = m_Source;
-            }
-
-            var response = new CostMatrixResponseMessage
-                           {
-                               Matrix = costMatrix.Matrix
-                           };
-
-            m_Bus.PublishAsync(response);
         }
     }
 }
