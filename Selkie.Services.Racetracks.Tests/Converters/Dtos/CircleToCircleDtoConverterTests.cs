@@ -1,25 +1,27 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using NSubstitute;
-using Ploeh.AutoFixture.Xunit;
+using NUnit.Framework;
 using Selkie.Geometry.Shapes;
+using Selkie.NUnit.Extensions;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
 using Selkie.Services.Racetracks.Interfaces.Converters.Dtos;
-using Selkie.XUnit.Extensions;
-using Xunit;
-using Xunit.Extensions;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 {
-    public class CircleToCircleDtoConverterTests
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    internal class CircleToCircleDtoConverterTests
     {
         [Theory]
         [AutoNSubstituteData]
-        public void Convert_SetsDtoCentrePoint_ForCircle([NotNull, Frozen] IPointToPointDtoConverter converter,
-                                                         [NotNull] CircleToCircleDtoConverter sut)
+        public void Convert_SetsDtoCentrePoint_ForCircle([NotNull] IPointToPointDtoConverter converter)
         {
             // Arrange
+            var sut = new CircleToCircleDtoConverter(converter);
+
             converter.Dto.Returns(new PointDto
                                   {
                                       X = 1.0,

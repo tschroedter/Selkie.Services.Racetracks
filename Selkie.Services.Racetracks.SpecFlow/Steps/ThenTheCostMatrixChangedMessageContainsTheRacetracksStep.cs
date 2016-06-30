@@ -33,7 +33,7 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps
 
         private static bool IsReceived()
         {
-            var isReceived = ( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixResponseMessage" ];
+            bool isReceived = GetBoolValueForScenarioContext("IsReceivedCostMatrixResponseMessage");
             var matrix = ( double[][] ) ScenarioContext.Current [ "Matrix" ];
 
             bool received = isReceived && matrix.GetLength(0) == 4;

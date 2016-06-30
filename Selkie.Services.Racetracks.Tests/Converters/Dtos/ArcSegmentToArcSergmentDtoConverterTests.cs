@@ -1,94 +1,18 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using NUnit.Framework;
 using Selkie.Geometry;
 using Selkie.Geometry.Shapes;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
 using Selkie.Windsor.Extensions;
-using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 {
-    public class ArcSegmentToArcSergmentDtoConverterTests
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    internal sealed class ArcSegmentToArcSergmentDtoConverterTests
     {
-        [Fact]
-        public void Convert_SetsCircleDto_ForArcSegment()
-        {
-            // Arrange
-            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
-            sut.ArcSegment = CreateArcSegment();
-
-            // Act
-            sut.Convert();
-
-            // Assert
-            AssertCircleDto(sut.Dto.Circle,
-                            1.0,
-                            2.0,
-                            3.0);
-        }
-
-        [Fact]
-        public void Convert_SetsEndPointDto_ForArcSegment()
-        {
-            // Arrange
-            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
-            sut.ArcSegment = CreateArcSegment();
-
-            // Act
-            sut.Convert();
-
-            // Assert
-            DtoHelper.AssertPointDto(sut.Dto.EndPoint,
-                                     4.0,
-                                     2.0);
-        }
-
-        [Fact]
-        public void Convert_SetsIsUnknown_ForArcSegment()
-        {
-            // Arrange
-            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
-            sut.ArcSegment = CreateArcSegment();
-
-            // Act
-            sut.Convert();
-            ArcSegmentDto actual = sut.Dto;
-
-            // Assert
-            Assert.False(actual.IsUnknown);
-        }
-
-        [Fact]
-        public void Convert_SetsStartPointDto_ForArcSegment()
-        {
-            // Arrange
-            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
-            sut.ArcSegment = CreateArcSegment();
-
-            // Act
-            sut.Convert();
-
-            // Assert
-            DtoHelper.AssertPointDto(sut.Dto.StartPoint,
-                                     1.0,
-                                     5.0);
-        }
-
-        [Fact]
-        public void Convert_SetsTurnDirection_ForArcSegment()
-        {
-            // Arrange
-            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
-            sut.ArcSegment = CreateArcSegment();
-
-            // Act
-            sut.Convert();
-            string actual = sut.Dto.TurnDirection;
-
-            // Assert
-            Assert.True(actual == Constants.TurnDirection.Clockwise.ToString());
-        }
-
         private static ArcSegmentToArcSegmentDtoConverter CreateSut()
         {
             return new ArcSegmentToArcSegmentDtoConverter(new PointToPointDtoConverter(),
@@ -125,6 +49,85 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
                                             endPoint);
 
             return arcSegment;
+        }
+
+        [Test]
+        public void Convert_SetsCircleDto_ForArcSegment()
+        {
+            // Arrange
+            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
+            sut.ArcSegment = CreateArcSegment();
+
+            // Act
+            sut.Convert();
+
+            // Assert
+            AssertCircleDto(sut.Dto.Circle,
+                            1.0,
+                            2.0,
+                            3.0);
+        }
+
+        [Test]
+        public void Convert_SetsEndPointDto_ForArcSegment()
+        {
+            // Arrange
+            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
+            sut.ArcSegment = CreateArcSegment();
+
+            // Act
+            sut.Convert();
+
+            // Assert
+            DtoHelper.AssertPointDto(sut.Dto.EndPoint,
+                                     4.0,
+                                     2.0);
+        }
+
+        [Test]
+        public void Convert_SetsIsUnknown_ForArcSegment()
+        {
+            // Arrange
+            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
+            sut.ArcSegment = CreateArcSegment();
+
+            // Act
+            sut.Convert();
+            ArcSegmentDto actual = sut.Dto;
+
+            // Assert
+            Assert.False(actual.IsUnknown);
+        }
+
+        [Test]
+        public void Convert_SetsStartPointDto_ForArcSegment()
+        {
+            // Arrange
+            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
+            sut.ArcSegment = CreateArcSegment();
+
+            // Act
+            sut.Convert();
+
+            // Assert
+            DtoHelper.AssertPointDto(sut.Dto.StartPoint,
+                                     1.0,
+                                     5.0);
+        }
+
+        [Test]
+        public void Convert_SetsTurnDirection_ForArcSegment()
+        {
+            // Arrange
+            ArcSegmentToArcSegmentDtoConverter sut = CreateSut();
+            sut.ArcSegment = CreateArcSegment();
+
+            // Act
+            sut.Convert();
+            string actual = sut.Dto.TurnDirection;
+
+            // Assert
+            Assert.True(actual == Constants.TurnDirection.Clockwise.ToString());
         }
     }
 }

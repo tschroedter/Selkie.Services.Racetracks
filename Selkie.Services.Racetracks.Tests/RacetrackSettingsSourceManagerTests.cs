@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
+using NUnit.Framework;
+using Selkie.NUnit.Extensions;
 using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Windsor;
-using Selkie.XUnit.Extensions;
-using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests
 {
     [ExcludeFromCodeCoverage]
-    public sealed class RacetrackSettingsSourceManagerTests
+    [TestFixture]
+    internal sealed class RacetrackSettingsSourceManagerTests
     {
         public RacetrackSettingsSourceManagerTests()
         {
@@ -21,7 +22,7 @@ namespace Selkie.Services.Racetracks.Tests
         private readonly ISelkieLogger m_Logger;
         private readonly RacetrackSettingsSourceManager m_Manager;
 
-        [Fact]
+        [Test]
         public void SetSettings_SetsTurnRadiusForPort_WhenCalled()
         {
             var settings = new RacetrackSettings
@@ -36,11 +37,11 @@ namespace Selkie.Services.Racetracks.Tests
 
             IRacetrackSettingsSource actual = m_Manager.Source;
 
-            XUnitHelper.AssertIsEquivalent(100.0,
+            NUnitHelper.AssertIsEquivalent(100.0,
                                            actual.TurnRadiusForPort);
         }
 
-        [Fact]
+        [Test]
         public void SetSettings_ThrowsException_ForTurnRadiusForPortIsNegative()
         {
             var settings = new RacetrackSettings
@@ -54,7 +55,7 @@ namespace Selkie.Services.Racetracks.Tests
             Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
-        [Fact]
+        [Test]
         public void SetSettings_ThrowsException_ForTurnRadiusForPortIsZero()
         {
             var settings = new RacetrackSettings
@@ -68,7 +69,7 @@ namespace Selkie.Services.Racetracks.Tests
             Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
-        [Fact]
+        [Test]
         public void SetSettings_ThrowsException_ForTurnRadiusForStarboardIsNegative()
         {
             var settings = new RacetrackSettings
@@ -82,7 +83,7 @@ namespace Selkie.Services.Racetracks.Tests
             Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
-        [Fact]
+        [Test]
         public void SetSettings_ThrowsException_ForTurnRadiusForStarboardIsZero()
         {
             var settings = new RacetrackSettings
@@ -96,13 +97,13 @@ namespace Selkie.Services.Racetracks.Tests
             Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
-        [Fact]
+        [Test]
         public void Source_ReturnsDefault_WhenCalled()
         {
             Assert.NotNull(m_Manager.Source);
         }
 
-        [Fact]
+        [Test]
         public void Start_CallsLogger_WhenCalled()
         {
             m_Manager.Start();
@@ -110,7 +111,7 @@ namespace Selkie.Services.Racetracks.Tests
             m_Logger.Received().Info(Arg.Is <string>(x => x.StartsWith("Started")));
         }
 
-        [Fact]
+        [Test]
         public void Stop_CallsLogger_WhenCalled()
         {
             m_Manager.Stop();

@@ -2,16 +2,17 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using NSubstitute;
-using Ploeh.AutoFixture.Xunit;
+using NUnit.Framework;
+using Ploeh.AutoFixture.NUnit3;
 using Selkie.EasyNetQ;
+using Selkie.NUnit.Extensions;
 using Selkie.Services.Common.Messages;
-using Selkie.XUnit.Extensions;
-using Xunit.Extensions;
 
 namespace Selkie.Services.Racetracks.Tests
 {
     [ExcludeFromCodeCoverage]
-    public sealed class ServiceTests
+    [TestFixture]
+    internal sealed class ServiceTests
     {
         [Theory]
         [AutoNSubstituteData]

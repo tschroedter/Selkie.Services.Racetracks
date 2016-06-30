@@ -8,10 +8,10 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
         [Then(@"the result should be that I received a ServiceStoppedMessage")]
         public override void Do()
         {
-            SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedServiceStoppedResponse" ],
+            SleepWaitAndDo(() => GetBoolValueForScenarioContext("IsReceivedServiceStoppedResponse"),
                            DoNothing);
 
-            Assert.True(( bool ) ScenarioContext.Current [ "IsReceivedServiceStoppedResponse" ],
+            Assert.True(GetBoolValueForScenarioContext("IsReceivedServiceStoppedResponse"),
                         "Didn't receive service stopped response!");
         }
     }

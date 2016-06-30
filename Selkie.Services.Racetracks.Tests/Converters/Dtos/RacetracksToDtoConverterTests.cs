@@ -1,16 +1,18 @@
-﻿using JetBrains.Annotations;
+﻿using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 using NSubstitute;
+using NUnit.Framework;
+using Selkie.NUnit.Extensions;
 using Selkie.Racetrack.Interfaces;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
 using Selkie.Services.Racetracks.Interfaces.Converters.Dtos;
-using Selkie.XUnit.Extensions;
-using Xunit;
-using Xunit.Extensions;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 {
-    public class RacetracksToDtoConverterTests
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    internal class RacetracksToDtoConverterTests
     {
         [Theory]
         [AutoNSubstituteData]

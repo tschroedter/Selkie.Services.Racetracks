@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using Selkie.XUnit.Extensions;
-using Xunit;
+using NUnit.Framework;
+using Selkie.NUnit.Extensions;
 
 namespace Selkie.Services.Racetracks.Tests
 {
     [ExcludeFromCodeCoverage]
+    [TestFixture]
     internal sealed class RacetrackSettingsSourceTests
     {
         public RacetrackSettingsSourceTests()
@@ -17,15 +18,15 @@ namespace Selkie.Services.Racetracks.Tests
 
         private readonly RacetrackSettingsSource m_Source;
 
-        [Fact]
+        [Test]
         public void DefaultTest()
         {
             RacetrackSettingsSource actual = RacetrackSettingsSource.Default;
 
-            XUnitHelper.AssertIsEquivalent(RacetrackSettingsSource.DefaultRadius,
+            NUnitHelper.AssertIsEquivalent(RacetrackSettingsSource.DefaultRadius,
                                            actual.TurnRadiusForPort,
                                            "TurnRadiusForPortTurnInMetres");
-            XUnitHelper.AssertIsEquivalent(RacetrackSettingsSource.DefaultRadius,
+            NUnitHelper.AssertIsEquivalent(RacetrackSettingsSource.DefaultRadius,
                                            actual.TurnRadiusForStarboard,
                                            "TurnRadiusForStarboard");
             Assert.True(m_Source.IsPortTurnAllowed,
@@ -34,29 +35,29 @@ namespace Selkie.Services.Racetracks.Tests
                         "IsStarboardTurnAllowed");
         }
 
-        [Fact]
+        [Test]
         public void IsPortTurnAllowedTest()
         {
             Assert.True(m_Source.IsPortTurnAllowed);
         }
 
-        [Fact]
+        [Test]
         public void IsStarboardTurnAllowedTest()
         {
             Assert.True(m_Source.IsStarboardTurnAllowed);
         }
 
-        [Fact]
+        [Test]
         public void TurnRadiusForPortTurnInMetresTest()
         {
-            XUnitHelper.AssertIsEquivalent(100.0,
+            NUnitHelper.AssertIsEquivalent(100.0,
                                            m_Source.TurnRadiusForPort);
         }
 
-        [Fact]
+        [Test]
         public void TurnRadiusForStarboardTurnInMetresTest()
         {
-            XUnitHelper.AssertIsEquivalent(200.0,
+            NUnitHelper.AssertIsEquivalent(200.0,
                                            m_Source.TurnRadiusForStarboard);
         }
     }

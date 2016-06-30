@@ -1,15 +1,16 @@
 using System.Diagnostics.CodeAnalysis;
+using NUnit.Framework;
 using Selkie.Geometry;
 using Selkie.Geometry.Primitives;
 using Selkie.Geometry.Shapes;
 using Selkie.Geometry.Surveying;
 using Selkie.Services.Common.Dto;
-using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests
 {
     [ExcludeFromCodeCoverage]
-    public sealed class SurveyFeatureToSurveyFeatureDtoConverterTests
+    [TestFixture]
+    internal sealed class SurveyFeatureToSurveyFeatureDtoConverterTests
     {
         public SurveyFeatureToSurveyFeatureDtoConverterTests()
         {
@@ -55,7 +56,7 @@ namespace Selkie.Services.Racetracks.Tests
         private readonly SurveyFeatureDto m_Dto;
         private readonly SurveyFeature m_Feature;
 
-        [Fact]
+        [Test]
         public void ConvertToDto_ReturnsDtoWithCorrectAngleToXAxisAtEndPoint_WhenCalled()
         {
             // Arrange
@@ -63,11 +64,11 @@ namespace Selkie.Services.Racetracks.Tests
             SurveyFeatureDto actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToDto(m_Feature);
 
             // Assert
-            Assert.Equal(90.0,
-                         actual.AngleToXAxisAtEndPoint);
+            Assert.AreEqual(90.0,
+                            actual.AngleToXAxisAtEndPoint);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToDto_ReturnsDtoWithCorrectAngleToXAxisAtStartPoint_WhenCalled()
         {
             // Arrange
@@ -75,11 +76,11 @@ namespace Selkie.Services.Racetracks.Tests
             SurveyFeatureDto actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToDto(m_Feature);
 
             // Assert
-            Assert.Equal(45.0,
-                         actual.AngleToXAxisAtStartPoint);
+            Assert.AreEqual(45.0,
+                            actual.AngleToXAxisAtStartPoint);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToDto_ReturnsDtoWithCorrectEndPoint_WhenCalled()
         {
             // Arrange
@@ -87,13 +88,13 @@ namespace Selkie.Services.Racetracks.Tests
             SurveyFeatureDto actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToDto(m_Feature);
 
             // Assert
-            Assert.Equal(11.0,
-                         actual.EndPoint.X);
-            Assert.Equal(22.0,
-                         actual.EndPoint.Y);
+            Assert.AreEqual(11.0,
+                            actual.EndPoint.X);
+            Assert.AreEqual(22.0,
+                            actual.EndPoint.Y);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToDto_ReturnsDtoWithCorrectId_WhenCalled()
         {
             // Arrange
@@ -101,11 +102,11 @@ namespace Selkie.Services.Racetracks.Tests
             SurveyFeatureDto actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToDto(m_Feature);
 
             // Assert
-            Assert.Equal(1,
-                         actual.Id);
+            Assert.AreEqual(1,
+                            actual.Id);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToDto_ReturnsDtoWithCorrectLength_WhenCalled()
         {
             // Arrange
@@ -113,11 +114,11 @@ namespace Selkie.Services.Racetracks.Tests
             SurveyFeatureDto actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToDto(m_Feature);
 
             // Assert
-            Assert.Equal(14.14,
-                         actual.Length);
+            Assert.AreEqual(14.14,
+                            actual.Length);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToDto_ReturnsDtoWithCorrectRunDirection_WhenCalled()
         {
             // Arrange
@@ -125,11 +126,11 @@ namespace Selkie.Services.Racetracks.Tests
             SurveyFeatureDto actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToDto(m_Feature);
 
             // Assert
-            Assert.Equal("Forward",
-                         actual.RunDirection);
+            Assert.AreEqual("Forward",
+                            actual.RunDirection);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToDto_ReturnsDtoWithCorrectStartPoint_WhenCalled()
         {
             // Arrange
@@ -137,13 +138,13 @@ namespace Selkie.Services.Racetracks.Tests
             SurveyFeatureDto actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToDto(m_Feature);
 
             // Assert
-            Assert.Equal(1.0,
-                         actual.StartPoint.X);
-            Assert.Equal(2.0,
-                         actual.StartPoint.Y);
+            Assert.AreEqual(1.0,
+                            actual.StartPoint.X);
+            Assert.AreEqual(2.0,
+                            actual.StartPoint.Y);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToSurveyFeature_ReturnsDtoWithCorrectAngleToXAxisAtEndPoint_WhenCalled()
         {
             // Arrange
@@ -151,11 +152,11 @@ namespace Selkie.Services.Racetracks.Tests
             ISurveyFeature actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToSurveyFeature(m_Dto);
 
             // Assert
-            Assert.Equal(Angle.For90Degrees,
-                         actual.AngleToXAxisAtEndPoint);
+            Assert.AreEqual(Angle.For90Degrees,
+                            actual.AngleToXAxisAtEndPoint);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToSurveyFeature_ReturnsDtoWithCorrectAngleToXAxisAtStartPoint_WhenCalled()
         {
             // Arrange
@@ -163,11 +164,11 @@ namespace Selkie.Services.Racetracks.Tests
             ISurveyFeature actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToSurveyFeature(m_Dto);
 
             // Assert
-            Assert.Equal(Angle.For45Degrees,
-                         actual.AngleToXAxisAtStartPoint);
+            Assert.AreEqual(Angle.For45Degrees,
+                            actual.AngleToXAxisAtStartPoint);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToSurveyFeature_ReturnsDtoWithCorrectEndPoint_WhenCalled()
         {
             // Arrange
@@ -175,13 +176,13 @@ namespace Selkie.Services.Racetracks.Tests
             ISurveyFeature actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToSurveyFeature(m_Dto);
 
             // Assert
-            Assert.Equal(11.0,
-                         actual.EndPoint.X);
-            Assert.Equal(22.0,
-                         actual.EndPoint.Y);
+            Assert.AreEqual(11.0,
+                            actual.EndPoint.X);
+            Assert.AreEqual(22.0,
+                            actual.EndPoint.Y);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToSurveyFeature_ReturnsDtoWithCorrectId_WhenCalled()
         {
             // Arrange
@@ -189,11 +190,11 @@ namespace Selkie.Services.Racetracks.Tests
             ISurveyFeature actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToSurveyFeature(m_Dto);
 
             // Assert
-            Assert.Equal(1,
-                         actual.Id);
+            Assert.AreEqual(1,
+                            actual.Id);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToSurveyFeature_ReturnsDtoWithCorrectLength_WhenCalled()
         {
             // Arrange
@@ -201,11 +202,11 @@ namespace Selkie.Services.Racetracks.Tests
             ISurveyFeature actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToSurveyFeature(m_Dto);
 
             // Assert
-            Assert.Equal(14.14,
-                         actual.Length);
+            Assert.AreEqual(14.14,
+                            actual.Length);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToSurveyFeature_ReturnsDtoWithCorrectRunDirection_WhenCalled()
         {
             // Arrange
@@ -213,11 +214,11 @@ namespace Selkie.Services.Racetracks.Tests
             ISurveyFeature actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToSurveyFeature(m_Dto);
 
             // Assert
-            Assert.Equal(Constants.LineDirection.Forward,
-                         actual.RunDirection);
+            Assert.AreEqual(Constants.LineDirection.Forward,
+                            actual.RunDirection);
         }
 
-        [Fact]
+        [Test]
         public void ConvertToSurveyFeature_ReturnsDtoWithCorrectStartPoint_WhenCalled()
         {
             // Arrange
@@ -225,10 +226,10 @@ namespace Selkie.Services.Racetracks.Tests
             ISurveyFeature actual = SurveyFeatureToSurveyFeatureDtoConverter.ConvertToSurveyFeature(m_Dto);
 
             // Assert
-            Assert.Equal(1.0,
-                         actual.StartPoint.X);
-            Assert.Equal(2.0,
-                         actual.StartPoint.Y);
+            Assert.AreEqual(1.0,
+                            actual.StartPoint.X);
+            Assert.AreEqual(2.0,
+                            actual.StartPoint.Y);
         }
     }
 }

@@ -3,18 +3,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 using NSubstitute;
-using Ploeh.AutoFixture.Xunit;
+using NUnit.Framework;
+using Ploeh.AutoFixture.NUnit3;
 using Selkie.Geometry.Surveying;
+using Selkie.NUnit.Extensions;
 using Selkie.Services.Common.Dto;
 using Selkie.Windsor;
-using Selkie.XUnit.Extensions;
-using Xunit;
-using Xunit.Extensions;
 
 namespace Selkie.Services.Racetracks.Tests
 {
     [ExcludeFromCodeCoverage]
-    public sealed class SurveyFeaturesSourceManagerTests
+    [TestFixture]
+    internal sealed class SurveyFeaturesSourceManagerTests
     {
         [Theory]
         [AutoNSubstituteData]
@@ -42,8 +42,8 @@ namespace Selkie.Services.Racetracks.Tests
             manager.SetSurveyFeaturesIfValid(null);
 
             // assert
-            Assert.Equal(0,
-                         manager.Features.Count());
+            Assert.AreEqual(0,
+                            manager.Features.Count());
         }
 
         [Theory]
@@ -60,8 +60,8 @@ namespace Selkie.Services.Racetracks.Tests
             // assert
             IEnumerable <ISurveyFeature> actual = manager.Features;
 
-            Assert.Equal(dtos.Length,
-                         actual.Count());
+            Assert.AreEqual(dtos.Length,
+                            actual.Count());
         }
 
         [Theory]

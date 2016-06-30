@@ -1,17 +1,18 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
-using Selkie.Common;
+using NUnit.Framework;
 using Selkie.Geometry.Primitives;
+using Selkie.NUnit.Extensions;
 using Selkie.Racetrack.Interfaces;
 using Selkie.Services.Racetracks.Converters;
 using Selkie.Windsor;
-using Selkie.XUnit.Extensions;
-using Xunit;
+using Constants = Selkie.Geometry.Constants;
 
 namespace Selkie.Services.Racetracks.Tests.Converters
 {
     [ExcludeFromCodeCoverage]
-    public sealed class CostEndToEndCalculatorTests
+    [TestFixture]
+    internal sealed class CostEndToEndCalculatorTests
     {
         public CostEndToEndCalculatorTests()
         {
@@ -46,7 +47,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters
         private readonly IPath[][] m_Paths;
         private readonly IRacetracks m_Racetracks;
 
-        [Fact]
+        [Test]
         public void CalculateRacetrackCostTest()
         {
             m_Racetracks.ForwardToReverse.Returns(m_Paths);
@@ -55,7 +56,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters
             double actual = m_Calculator.CalculateRacetrackCost(0,
                                                                 1);
 
-            XUnitHelper.AssertIsEquivalent(expected,
+            NUnitHelper.AssertIsEquivalent(expected,
                                            actual,
                                            Constants.EpsilonDistance,
                                            "Racetrack length is wrong!");

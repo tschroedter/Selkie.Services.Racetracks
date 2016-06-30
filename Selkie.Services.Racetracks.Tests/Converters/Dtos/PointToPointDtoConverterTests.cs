@@ -1,12 +1,15 @@
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
+using NUnit.Framework;
 using Selkie.Geometry.Shapes;
+using Selkie.NUnit.Extensions;
 using Selkie.Services.Racetracks.Converters.Dtos;
-using Selkie.XUnit.Extensions;
-using Xunit.Extensions;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 {
-    public class PointToPointDtoConverterTests
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    internal class PointToPointDtoConverterTests
     {
         [Theory]
         [AutoNSubstituteData]

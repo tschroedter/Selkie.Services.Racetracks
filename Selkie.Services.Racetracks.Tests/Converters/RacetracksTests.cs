@@ -1,31 +1,32 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using NUnit.Framework;
 using Selkie.Racetrack.Interfaces;
-using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests.Converters
 {
     [ExcludeFromCodeCoverage]
-    public sealed class RacetracksTests
+    [TestFixture]
+    internal sealed class RacetracksTests
     {
-        [Fact]
+        [Test]
         public void ForwardToForwardDefaultTest()
         {
             IPath[][] actual = Racetracks.Converters.Dtos.Racetracks.Unknown.ForwardToForward;
 
-            Assert.Equal(0,
-                         actual.GetLength(0));
+            Assert.AreEqual(0,
+                            actual.GetLength(0));
         }
 
-        [Fact]
+        [Test]
         public void ForwardToReverseDefaultTest()
         {
             IPath[][] actual = Racetracks.Converters.Dtos.Racetracks.Unknown.ForwardToReverse;
 
-            Assert.Equal(0,
-                         actual.GetLength(0));
+            Assert.AreEqual(0,
+                            actual.GetLength(0));
         }
 
-        [Fact]
+        [Test]
         public void IsUnknownTest()
         {
             bool actual = Racetracks.Converters.Dtos.Racetracks.Unknown.IsUnknown;
@@ -33,22 +34,22 @@ namespace Selkie.Services.Racetracks.Tests.Converters
             Assert.True(actual);
         }
 
-        [Fact]
+        [Test]
         public void ReverseToForwardDefaultTest()
         {
             IPath[][] actual = Racetracks.Converters.Dtos.Racetracks.Unknown.ReverseToForward;
 
-            Assert.Equal(0,
-                         actual.GetLength(0));
+            Assert.AreEqual(0,
+                            actual.GetLength(0));
         }
 
-        [Fact]
+        [Test]
         public void ReverseToReverseDefaultTest()
         {
             IPath[][] actual = Racetracks.Converters.Dtos.Racetracks.Unknown.ReverseToReverse;
 
-            Assert.Equal(0,
-                         actual.GetLength(0));
+            Assert.AreEqual(0,
+                            actual.GetLength(0));
         }
     }
 }

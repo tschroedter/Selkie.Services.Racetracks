@@ -1,35 +1,21 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using JetBrains.Annotations;
 using NSubstitute;
-using Selkie.Geometry;
+using NUnit.Framework;
 using Selkie.Geometry.Shapes;
+using Selkie.NUnit.Extensions;
 using Selkie.Services.Racetracks.Converters.Dtos;
-using Selkie.XUnit.Extensions;
-using Xunit;
-using Xunit.Extensions;
+using Constants = Selkie.Geometry.Constants;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 {
-    public class PolylineToPolylineDtoConverterTests
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    internal class PolylineToPolylineDtoConverterTests
     {
         private const int DoNotCareId = -1;
-
-        [Fact]
-        public void Convert_UpdatesDto_ForPolyline()
-        {
-            // Arrange
-            IPolyline polyline = CreatePolyline();
-            PolylineToPolylineDtoConverter sut = CreateSut();
-            sut.Polyline = polyline;
-
-            // Act
-            sut.Convert();
-
-            // Assert
-            Assert.True(sut.Dto.Segments.Length == polyline.Segments.Count(),
-                        "Segments count");
-        }
 
         [Theory]
         [AutoNSubstituteData]
@@ -89,19 +75,6 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
             // Act
             // Assert
             Assert.True(sut.IsPolylineAUturn(polyline));
-        }
-
-        [Fact]
-        public void Polyline_Updates_ForNewPolyline()
-        {
-            // Arrange
-            IPolyline polyline = CreatePolyline();
-            PolylineToPolylineDtoConverter sut = CreateSut();
-            sut.Polyline = polyline;
-
-            // Act
-            // Assert
-            Assert.True(sut.Polyline == polyline);
         }
 
         private static ArcSegment CreateEndArcSegment()
@@ -236,6 +209,35 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
             polyline.Segments.Returns(segments);
 
             return polyline;
+        }
+
+        [Test]
+        public void Convert_UpdatesDto_ForPolyline()
+        {
+            // Arrange
+            IPolyline polyline = CreatePolyline();
+            PolylineToPolylineDtoConverter sut = CreateSut();
+            sut.Polyline = polyline;
+
+            // Act
+            sut.Convert();
+
+            // Assert
+            Assert.True(sut.Dto.Segments.Length == polyline.Segments.Count(),
+                        "Segments count");
+        }
+
+        [Test]
+        public void Polyline_Updates_ForNewPolyline()
+        {
+            // Arrange
+            IPolyline polyline = CreatePolyline();
+            PolylineToPolylineDtoConverter sut = CreateSut();
+            sut.Polyline = polyline;
+
+            // Act
+            // Assert
+            Assert.True(sut.Polyline == polyline);
         }
     }
 }

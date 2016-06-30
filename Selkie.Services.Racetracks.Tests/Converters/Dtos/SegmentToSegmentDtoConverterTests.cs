@@ -1,63 +1,18 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
+using NUnit.Framework;
 using Selkie.Common;
 using Selkie.Geometry.Shapes;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
-using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 {
-    public class SegmentToSegmentDtoConverterTests
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    internal class SegmentToSegmentDtoConverterTests
     {
-        [Fact]
-        public void Convert_ReturnsDto_ForArcSegment()
-        {
-            // Arrange
-            SegmentToSegmentDtoConverter sut = CreateSut();
-            IArcSegment arcSegment = CreateArcSegment();
-            sut.Segment = arcSegment;
-
-            // Act
-            sut.Convert();
-            var actual = sut.Dto as ArcSegmentDto;
-
-            // Assert
-            AssertArcSegmentDto(actual,
-                                arcSegment);
-        }
-
-        [Fact]
-        public void Convert_ReturnsDto_ForLineSegment()
-        {
-            // Arrange
-            SegmentToSegmentDtoConverter sut = CreateSut();
-            sut.Segment = CreateLineSegment();
-
-            // Act
-            sut.Convert();
-            SegmentDto actual = sut.Dto;
-
-            // Assert
-            AssertLineDto(actual,
-                          1.0,
-                          2.0,
-                          3.0,
-                          4.0);
-        }
-
-        [Fact]
-        public void Convert_Throws_ForUnknwonSegment()
-        {
-            // Arrange
-            SegmentToSegmentDtoConverter sut = CreateSut();
-            sut.Segment = Substitute.For <IPolylineSegment>();
-
-            // Act
-            // Assert
-            Assert.Throws <ArgumentException>(() => sut.Convert());
-        }
-
         private void AssertArcSegmentDto(ArcSegmentDto actual,
                                          IArcSegment segment)
         {
@@ -133,6 +88,54 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
                                                                                             new PointToPointDtoConverter
                                                                                                 ())),
                                                  new LineToLineSegmentDtoConverter(new PointToPointDtoConverter()));
+        }
+
+        [Test]
+        public void Convert_ReturnsDto_ForArcSegment()
+        {
+            // Arrange
+            SegmentToSegmentDtoConverter sut = CreateSut();
+            IArcSegment arcSegment = CreateArcSegment();
+            sut.Segment = arcSegment;
+
+            // Act
+            sut.Convert();
+            var actual = sut.Dto as ArcSegmentDto;
+
+            // Assert
+            AssertArcSegmentDto(actual,
+                                arcSegment);
+        }
+
+        [Test]
+        public void Convert_ReturnsDto_ForLineSegment()
+        {
+            // Arrange
+            SegmentToSegmentDtoConverter sut = CreateSut();
+            sut.Segment = CreateLineSegment();
+
+            // Act
+            sut.Convert();
+            SegmentDto actual = sut.Dto;
+
+            // Assert
+            AssertLineDto(actual,
+                          1.0,
+                          2.0,
+                          3.0,
+                          4.0);
+        }
+
+        [Test]
+        public void Convert_Throws_ForUnknwonSegment()
+        {
+            // Arrange
+            SegmentToSegmentDtoConverter sut = CreateSut();
+            sut.Segment = Substitute.For <IPolylineSegment>();
+
+            // Act
+            // Assert
+            Assert.Throws <ArgumentException>(() => sut.Convert());
         }
     }
 }

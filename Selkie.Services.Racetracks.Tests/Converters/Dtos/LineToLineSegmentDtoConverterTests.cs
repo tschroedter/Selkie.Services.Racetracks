@@ -1,13 +1,21 @@
+using System.Diagnostics.CodeAnalysis;
+using NUnit.Framework;
 using Selkie.Geometry.Shapes;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
-using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 {
-    public class LineToLineSegmentDtoConverterTests
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    internal class LineToLineSegmentDtoConverterTests
     {
-        [Fact]
+        private static LineToLineSegmentDtoConverter CreateSut()
+        {
+            return new LineToLineSegmentDtoConverter(new PointToPointDtoConverter());
+        }
+
+        [Test]
         public void Convert_SetsEndPoint_ForCircle()
         {
             // Arrange
@@ -27,7 +35,7 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
                                      4.0);
         }
 
-        [Fact]
+        [Test]
         public void Convert_SetsStartPoint_ForCircle()
         {
             // Arrange
@@ -45,11 +53,6 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
             DtoHelper.AssertPointDto(actual,
                                      1.0,
                                      2.0);
-        }
-
-        private static LineToLineSegmentDtoConverter CreateSut()
-        {
-            return new LineToLineSegmentDtoConverter(new PointToPointDtoConverter());
         }
     }
 }

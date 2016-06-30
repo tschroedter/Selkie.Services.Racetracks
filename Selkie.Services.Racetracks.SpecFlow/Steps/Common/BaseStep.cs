@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using JetBrains.Annotations;
 using Selkie.EasyNetQ;
 using TechTalk.SpecFlow;
@@ -8,8 +9,6 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
     [Binding]
     public abstract class BaseStep
     {
-        private readonly ISelkieBus m_Bus;
-
         protected BaseStep()
         {
             m_Bus = ( ISelkieBus ) ScenarioContext.Current [ "ISelkieBus" ];
@@ -23,17 +22,31 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
             }
         }
 
+        private readonly ISelkieBus m_Bus;
+
+        public static bool GetBoolValueForScenarioContext([NotNull] string key)
+        {
+            if ( !ScenarioContext.Current.Keys.Contains(key) )
+            {
+                return false;
+            }
+
+            var result = ( bool ) ScenarioContext.Current [ key ];
+
+            return result;
+        }
+
+        public abstract void Do();
+
+        public void DoNothing()
+        {
+        }
+
         public void SleepWaitAndDo([NotNull] Func <bool> breakIfTrue,
                                    [NotNull] Action doSomething)
         {
             Helper.SleepWaitAndDo(breakIfTrue,
                                   doSomething);
         }
-
-        public void DoNothing()
-        {
-        }
-
-        public abstract void Do();
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using NSubstitute;
+using NUnit.Framework;
 using Selkie.EasyNetQ;
 using Selkie.Geometry.Surveying;
 using Selkie.Racetrack.Interfaces;
@@ -10,13 +11,13 @@ using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Windsor;
-using Xunit;
 
 namespace Selkie.Services.Racetracks.Tests
 {
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     [ExcludeFromCodeCoverage]
-    public sealed class RacetracksSourceManagerTests
+    [TestFixture]
+    internal sealed class RacetracksSourceManagerTests
     {
         public RacetracksSourceManagerTests()
         {
@@ -60,7 +61,18 @@ namespace Selkie.Services.Racetracks.Tests
         private readonly IRacetrackSettingsSourceManager m_RacetrackSettingsSourceManager;
         private readonly ISurveyFeaturesSourceManager m_SurveyFeaturesSourceManager;
 
-        [Fact]
+        private RacetracksSourceManager CreateSut()
+        {
+            var manager = new RacetracksSourceManager(Substitute.For <ISelkieLogger>(),
+                                                      m_Bus,
+                                                      m_SurveyFeaturesSourceManager,
+                                                      m_RacetrackSettingsSourceManager,
+                                                      m_Factory,
+                                                      m_Converter);
+            return manager;
+        }
+
+        [Test]
         public void CalculateRacetracks_CallsCalculate_WhenCalled()
         {
             m_Manager.CalculateRacetracks();
@@ -68,7 +80,7 @@ namespace Selkie.Services.Racetracks.Tests
             m_RacetracksCalculator.Received().Calculate();
         }
 
-        [Fact]
+        [Test]
         public void CalculateRacetracks_CallsCreate_WhenCalled()
         {
             m_Manager.CalculateRacetracks();
@@ -76,7 +88,7 @@ namespace Selkie.Services.Racetracks.Tests
             m_Factory.Received().Create <IRacetracksCalculator>();
         }
 
-        [Fact]
+        [Test]
         public void CalculateRacetracks_CallsRelease_WhenCalled()
         {
             // assemble
@@ -89,7 +101,7 @@ namespace Selkie.Services.Racetracks.Tests
             m_Factory.Received().Release(m_RacetracksCalculator);
         }
 
-        [Fact]
+        [Test]
         public void CalculateRacetracks_SendsMessage_WhenCalled()
         {
             m_Manager.CalculateRacetracks();
@@ -97,41 +109,41 @@ namespace Selkie.Services.Racetracks.Tests
             m_Bus.Received().PublishAsync(Arg.Any <RacetracksResponseMessage>());
         }
 
-        [Fact]
+        [Test]
         public void CalculateRacetracks_SetsFeatures_WhenCalled()
         {
             m_Manager.CalculateRacetracks();
 
-            Assert.Equal(m_SurveyFeaturesSourceManager.Features,
-                         m_RacetracksCalculator.Features);
+            Assert.AreEqual(m_SurveyFeaturesSourceManager.Features,
+                            m_RacetracksCalculator.Features);
         }
 
-        [Fact]
+        [Test]
         public void CalculateRacetracks_SetsTurnRadius_ForPort()
         {
             m_Manager.CalculateRacetracks();
 
-            Assert.Equal(m_RacetrackSettingsSourceManager.Source.TurnRadiusForPort,
-                         m_RacetracksCalculator.TurnRadiusForPort.Length);
+            Assert.AreEqual(m_RacetrackSettingsSourceManager.Source.TurnRadiusForPort,
+                            m_RacetracksCalculator.TurnRadiusForPort.Length);
         }
 
-        [Fact]
+        [Test]
         public void CalculateRacetracks_SetsTurnRadius_ForStarboard()
         {
             m_Manager.CalculateRacetracks();
 
-            Assert.Equal(m_RacetrackSettingsSourceManager.Source.TurnRadiusForStarboard,
-                         m_RacetracksCalculator.TurnRadiusForStarboard.Length);
+            Assert.AreEqual(m_RacetrackSettingsSourceManager.Source.TurnRadiusForStarboard,
+                            m_RacetracksCalculator.TurnRadiusForStarboard.Length);
         }
 
-        [Fact]
+        [Test]
         public void Constructor_SetsFeatures_WhenCalled()
         {
-            Assert.Equal(m_Features,
-                         m_RacetracksCalculator.Features);
+            Assert.AreEqual(m_Features,
+                            m_RacetracksCalculator.Features);
         }
 
-        [Fact]
+        [Test]
         public void Constructor_SubscribesToRacetracksGetMessage_WhenCalled()
         {
             // assemble
@@ -145,7 +157,7 @@ namespace Selkie.Services.Racetracks.Tests
                                             Arg.Any <Action <RacetracksGetMessage>>());
         }
 
-        [Fact]
+        [Test]
         public void Dispose_CallsRelease_WhenCalled()
         {
             // assemble
@@ -159,13 +171,13 @@ namespace Selkie.Services.Racetracks.Tests
             m_Factory.Received().Release(m_RacetracksCalculator);
         }
 
-        [Fact]
+        [Test]
         public void Racetracks_ReturnsDefault_WhenCalled()
         {
             Assert.NotNull(m_Manager.Racetracks);
         }
 
-        [Fact]
+        [Test]
         public void Racetracks_ReturnsRacetracks_WhenCalled()
         {
             // assemble
@@ -173,11 +185,11 @@ namespace Selkie.Services.Racetracks.Tests
             m_Manager.CalculateRacetracks();
 
             // assert
-            Assert.Equal(m_RacetracksCalculator,
-                         m_Manager.Racetracks);
+            Assert.AreEqual(m_RacetracksCalculator,
+                            m_Manager.Racetracks);
         }
 
-        [Fact]
+        [Test]
         public void RacetracksGetHandler_CallsConverter_WhenCalledt()
         {
             // assemble
@@ -191,7 +203,7 @@ namespace Selkie.Services.Racetracks.Tests
             m_Converter.Received().ConvertPaths(Arg.Any <IRacetracks>());
         }
 
-        [Fact]
+        [Test]
         public void RacetracksGetHandlerSendsMessageTest()
         {
             // assemble
@@ -205,7 +217,7 @@ namespace Selkie.Services.Racetracks.Tests
             m_Bus.Received().PublishAsync(Arg.Any <RacetracksResponseMessage>());
         }
 
-        [Fact]
+        [Test]
         public void SendRacetracksResponseMessage_SendsMessage_WhenCalled()
         {
             // assemble
@@ -216,17 +228,6 @@ namespace Selkie.Services.Racetracks.Tests
 
             // assert
             m_Bus.Received().PublishAsync(Arg.Is <RacetracksResponseMessage>(x => x.Racetracks == m_RacetracksDto));
-        }
-
-        private RacetracksSourceManager CreateSut()
-        {
-            var manager = new RacetracksSourceManager(Substitute.For <ISelkieLogger>(),
-                                                      m_Bus,
-                                                      m_SurveyFeaturesSourceManager,
-                                                      m_RacetrackSettingsSourceManager,
-                                                      m_Factory,
-                                                      m_Converter);
-            return manager;
         }
     }
 }

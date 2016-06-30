@@ -1,29 +1,31 @@
+using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using NSubstitute;
-using Selkie.Geometry;
+using NUnit.Framework;
 using Selkie.Geometry.Shapes;
+using Selkie.NUnit.Extensions;
 using Selkie.Racetrack;
 using Selkie.Racetrack.Interfaces;
 using Selkie.Services.Common.Dto;
 using Selkie.Services.Racetracks.Converters.Dtos;
 using Selkie.Services.Racetracks.Interfaces.Converters.Dtos;
-using Selkie.XUnit.Extensions;
-using Xunit;
-using Xunit.Extensions;
+using Constants = Selkie.Geometry.Constants;
 
 namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 {
-    public class PathToPathDtoConverterTests
+    [ExcludeFromCodeCoverage]
+    [TestFixture]
+    internal sealed class PathToPathDtoConverterTests
     {
         private const int DoNotCareId = -1;
 
         [Theory]
         [AutoNSubstituteData]
-        public void Convert_SetsEndPoint_ForPolyline([NotNull] PointDto startPointDto,
-                                                     [NotNull] PointDto endPointDto,
-                                                     [NotNull] IPointToPointDtoConverter pointToPointDto,
-                                                     [NotNull] IPolylineToPolylineDtoConverter
-                                                         polylineToPolylineDto)
+        public void Convert_SetsEndPoint_ForPolyline(
+            [NotNull] PointDto startPointDto,
+            [NotNull] PointDto endPointDto,
+            [NotNull] IPointToPointDtoConverter pointToPointDto,
+            [NotNull] IPolylineToPolylineDtoConverter polylineToPolylineDto)
         {
             // Arrange
             pointToPointDto.Dto.Returns(startPointDto,
@@ -45,9 +47,9 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 
         [Theory]
         [AutoNSubstituteData]
-        public void Convert_SetsIsUnknownToFalse_ForPolyline([NotNull] IPointToPointDtoConverter pointToPointDto,
-                                                             [NotNull] IPolylineToPolylineDtoConverter
-                                                                 polylineToPolylineDto)
+        public void Convert_SetsIsUnknownToFalse_ForPolyline(
+            [NotNull] IPointToPointDtoConverter pointToPointDto,
+            [NotNull] IPolylineToPolylineDtoConverter polylineToPolylineDto)
         {
             // Arrange
             var sut = new PathToPathDtoConverter(pointToPointDto,
@@ -66,10 +68,10 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 
         [Theory]
         [AutoNSubstituteData]
-        public void Convert_SetsPolyline_ForPolyline([NotNull] PolylineDto polylineDto,
-                                                     [NotNull] IPointToPointDtoConverter pointToPointDto,
-                                                     [NotNull] IPolylineToPolylineDtoConverter
-                                                         polylineToPolylineDto)
+        public void Convert_SetsPolyline_ForPolyline(
+            [NotNull] PolylineDto polylineDto,
+            [NotNull] IPointToPointDtoConverter pointToPointDto,
+            [NotNull] IPolylineToPolylineDtoConverter polylineToPolylineDto)
         {
             // Arrange
             polylineToPolylineDto.Dto.Returns(polylineDto);
@@ -90,11 +92,11 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 
         [Theory]
         [AutoNSubstituteData]
-        public void Convert_SetsStartPoint_ForPolyline([NotNull] PointDto startPointDto,
-                                                       [NotNull] PointDto endPointDto,
-                                                       [NotNull] IPointToPointDtoConverter pointToPointDto,
-                                                       [NotNull] IPolylineToPolylineDtoConverter
-                                                           polylineToPolylineDto)
+        public void Convert_SetsStartPoint_ForPolyline(
+            [NotNull] PointDto startPointDto,
+            [NotNull] PointDto endPointDto,
+            [NotNull] IPointToPointDtoConverter pointToPointDto,
+            [NotNull] IPolylineToPolylineDtoConverter polylineToPolylineDto)
         {
             // Arrange
             pointToPointDto.Dto.Returns(startPointDto,
@@ -116,8 +118,9 @@ namespace Selkie.Services.Racetracks.Tests.Converters.Dtos
 
         [Theory]
         [AutoNSubstituteData]
-        public void Path_Roundtrip_ForPath([NotNull] IPath path,
-                                           [NotNull] PathToPathDtoConverter sut)
+        public void Path_Roundtrip_ForPath(
+            [NotNull] IPath path,
+            [NotNull] PathToPathDtoConverter sut)
         {
             // Arrange
             // Act

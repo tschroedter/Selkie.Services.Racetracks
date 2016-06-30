@@ -10,10 +10,10 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps
         [Then(@"the result should be that I received a CostMatrixResponseMessage")]
         public override void Do()
         {
-            SleepWaitAndDo(() => ( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixResponseMessage" ],
+            SleepWaitAndDo(() => GetBoolValueForScenarioContext("IsReceivedCostMatrixResponseMessage"),
                            SendMessages);
 
-            Assert.True(( bool ) ScenarioContext.Current [ "IsReceivedCostMatrixResponseMessage" ],
+            Assert.True(GetBoolValueForScenarioContext("IsReceivedCostMatrixResponseMessage"),
                         "Did not receive CostMatrixResponseMessage!");
         }
 

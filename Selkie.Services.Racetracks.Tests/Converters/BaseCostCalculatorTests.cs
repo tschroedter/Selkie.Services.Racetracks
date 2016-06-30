@@ -2,20 +2,21 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using NSubstitute;
-using Selkie.Geometry;
+using NUnit.Framework;
 using Selkie.Geometry.Primitives;
 using Selkie.Geometry.Shapes;
 using Selkie.Geometry.Surveying;
+using Selkie.NUnit.Extensions;
 using Selkie.Racetrack.Interfaces;
 using Selkie.Services.Racetracks.Converters;
 using Selkie.Windsor;
-using Selkie.XUnit.Extensions;
-using Xunit;
+using Constants = Selkie.Geometry.Constants;
 
 namespace Selkie.Services.Racetracks.Tests.Converters
 {
     [ExcludeFromCodeCoverage]
-    public sealed class BaseCostCalculatorTests
+    [TestFixture]
+    internal sealed class BaseCostCalculatorTests
     {
         public BaseCostCalculatorTests()
         {
@@ -54,10 +55,10 @@ namespace Selkie.Services.Racetracks.Tests.Converters
 
             m_Logger = Substitute.For <ISelkieLogger>();
 
-            m_Calculator = new TestBaseCostCalculator(m_Logger);
+            m_Sut = new TestBaseCostCalculator(m_Logger);
         }
 
-        private readonly TestBaseCostCalculator m_Calculator;
+        private readonly TestBaseCostCalculator m_Sut;
         private readonly ISurveyFeature m_Feature1;
         private readonly ISurveyFeature m_Feature2;
         private readonly ISurveyFeature[] m_Features;
@@ -67,158 +68,6 @@ namespace Selkie.Services.Racetracks.Tests.Converters
         private IRacetracks m_Racetracks;
         private IPath[][] m_ReverseForwardPaths;
         private IPath[][] m_ReverseReversePaths;
-
-        [Fact]
-        public void CalculateRacetrackCostShouldLogsMessageForFromFeatureIdToBigIdTest()
-        {
-            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
-
-            m_Calculator.CheckAndCalculate(2,
-                                           1);
-
-            m_Logger.Received().Warn(Arg.Any <string>());
-        }
-
-        [Fact]
-        public void CalculateRacetrackCostShouldLogsMessageForNegativeFromFeatureIdTest()
-        {
-            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
-
-            m_Calculator.CheckAndCalculate(-1,
-                                           1);
-
-            m_Logger.Received().Warn(Arg.Any <string>());
-        }
-
-        [Fact]
-        public void CalculateRacetrackCostShouldLogsMessageForNegativeToFeatureIdTest()
-        {
-            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
-
-            m_Calculator.CheckAndCalculate(0,
-                                           -1);
-
-            m_Logger.Received().Warn(Arg.Any <string>());
-        }
-
-        [Fact]
-        public void CalculateRacetrackCostShouldLogsMessageForPathIsEmptyTest()
-        {
-            m_Racetracks.ForwardToReverse.Returns(new IPath[0][]);
-
-            m_Calculator.CheckAndCalculate(0,
-                                           2);
-
-            m_Logger.Received().Warn(Arg.Any <string>());
-        }
-
-        [Fact]
-        public void CalculateRacetrackCostShouldLogsMessageForToFeatureIdToBigIdTest()
-        {
-            m_Racetracks.ForwardToForward.Returns(m_ForwardForwardPaths);
-            m_Calculator.Racetracks = m_Racetracks;
-
-            m_Calculator.CheckAndCalculate(1,
-                                           2);
-
-            m_Logger.Received().Warn(Arg.Any <string>());
-        }
-
-        [Fact]
-        public void CalculateRacetrackCostShouldLogsMesssageForToFeatureIdToBigIdTest()
-        {
-            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
-
-            m_Calculator.CheckAndCalculate(0,
-                                           2);
-
-            m_Logger.Received().Warn(Arg.Any <string>());
-        }
-
-        [Fact]
-        public void CalculateTest()
-        {
-            m_Calculator.Features = m_Features;
-            m_Calculator.Feature = m_Feature1;
-            m_Calculator.Racetracks = m_Racetracks;
-            m_Calculator.Calculate();
-
-            Dictionary <int, double> actual = m_Calculator.Costs;
-
-            XUnitHelper.AssertIsEqual(2,
-                                      actual.Keys.Count,
-                                      "Count");
-            XUnitHelper.AssertIsEqual(CostMatrix.CostToMyself,
-                                      actual [ 0 ],
-                                      "actual [ 0 ]");
-            XUnitHelper.AssertIsEquivalent(100.0,
-                                           actual [ 1 ],
-                                           Selkie.Common.Constants.EpsilonDistance,
-                                           "actual[1]");
-        }
-
-        [Fact]
-        public void DefaultCostsTest()
-        {
-            Assert.NotNull(m_Calculator.Costs);
-        }
-
-        [Fact]
-        public void DefaultFeaturesTest()
-        {
-            Assert.NotNull(m_Calculator.Features);
-        }
-
-        [Fact]
-        public void DefaultFeatureTest()
-        {
-            Assert.NotNull(m_Calculator.Feature);
-            Assert.True(m_Calculator.Feature.IsUnknown,
-                        "IsUnknown");
-        }
-
-        [Fact]
-        public void DefaultRacetracksest()
-        {
-            Assert.True(m_Calculator.Racetracks == Racetracks.Converters.Dtos.Racetracks.Unknown);
-        }
-
-        [Fact]
-        public void RoundtripFeaturesTest()
-        {
-            var feature = Substitute.For <ISurveyFeature>();
-            ISurveyFeature[] features =
-            {
-                feature
-            };
-
-            m_Calculator.Features = features;
-
-            Assert.Equal(features,
-                         m_Calculator.Features);
-        }
-
-        [Fact]
-        public void RoundtripFeatureTest()
-        {
-            var feature = Substitute.For <ISurveyFeature>();
-
-            m_Calculator.Feature = feature;
-
-            Assert.Equal(feature,
-                         m_Calculator.Feature);
-        }
-
-        [Fact]
-        public void RoundtripRacetracksTest()
-        {
-            var racetracks = Substitute.For <IRacetracks>();
-
-            m_Calculator.Racetracks = racetracks;
-
-            Assert.Equal(racetracks,
-                         m_Calculator.Racetracks);
-        }
 
         [NotNull]
         private static IPath[][] CreateForwardForwardPaths()
@@ -325,6 +174,156 @@ namespace Selkie.Services.Racetracks.Tests.Converters
             {
                 return 100.0;
             }
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldLogsMessageForFromFeatureIdToBigIdTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
+
+            m_Sut.CheckAndCalculate(2,
+                                    1);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldLogsMessageForNegativeFromFeatureIdTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
+
+            m_Sut.CheckAndCalculate(-1,
+                                    1);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldLogsMessageForNegativeToFeatureIdTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
+
+            m_Sut.CheckAndCalculate(0,
+                                    -1);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldLogsMessageForPathIsEmptyTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(new IPath[0][]);
+
+            m_Sut.CheckAndCalculate(0,
+                                    2);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldLogsMessageForToFeatureIdToBigIdTest()
+        {
+            m_Racetracks.ForwardToForward.Returns(m_ForwardForwardPaths);
+            m_Sut.Racetracks = m_Racetracks;
+
+            m_Sut.CheckAndCalculate(1,
+                                    2);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateRacetrackCostShouldLogsMesssageForToFeatureIdToBigIdTest()
+        {
+            m_Racetracks.ForwardToReverse.Returns(m_ForwardForwardPaths);
+
+            m_Sut.CheckAndCalculate(0,
+                                    2);
+
+            m_Logger.Received().Warn(Arg.Any <string>());
+        }
+
+        [Test]
+        public void CalculateTest()
+        {
+            m_Sut.Features = m_Features;
+            m_Sut.Feature = m_Feature1;
+            m_Sut.Racetracks = m_Racetracks;
+            m_Sut.Calculate();
+
+            Dictionary <int, double> actual = m_Sut.Costs;
+
+            Assert.AreEqual(2,
+                            actual.Keys.Count,
+                            "Count");
+            Assert.AreEqual(CostMatrix.CostToMyself,
+                            actual [ 0 ],
+                            "actual [ 0 ]");
+            NUnitHelper.AssertIsEquivalent(100.0,
+                                           actual [ 1 ],
+                                           Selkie.Common.Constants.EpsilonDistance,
+                                           "actual[1]");
+        }
+
+        [Test]
+        public void DefaultCostsTest()
+        {
+            Assert.NotNull(m_Sut.Costs);
+        }
+
+        [Test]
+        public void DefaultFeaturesTest()
+        {
+            Assert.NotNull(m_Sut.Features);
+        }
+
+        [Test]
+        public void DefaultFeatureTest()
+        {
+            Assert.NotNull(m_Sut.Feature);
+        }
+
+        [Test]
+        public void DefaultRacetracksTest()
+        {
+            Assert.NotNull(m_Sut.Racetracks);
+        }
+
+        [Test]
+        public void RoundtripFeaturesTest()
+        {
+            var feature = Substitute.For <ISurveyFeature>();
+            ISurveyFeature[] features =
+            {
+                feature
+            };
+
+            m_Sut.Features = features;
+
+            Assert.AreEqual(features,
+                            m_Sut.Features);
+        }
+
+        [Test]
+        public void RoundtripFeatureTest()
+        {
+            var feature = Substitute.For <ISurveyFeature>();
+
+            m_Sut.Feature = feature;
+
+            Assert.AreEqual(feature,
+                            m_Sut.Feature);
+        }
+
+        [Test]
+        public void RoundtripRacetracksTest()
+        {
+            var racetracks = Substitute.For <IRacetracks>();
+
+            m_Sut.Racetracks = racetracks;
+
+            Assert.AreEqual(racetracks,
+                            m_Sut.Racetracks);
         }
     }
 }

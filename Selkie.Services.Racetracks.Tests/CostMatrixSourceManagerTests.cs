@@ -2,20 +2,20 @@
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
 using NSubstitute;
-using Ploeh.AutoFixture.Xunit;
+using NUnit.Framework;
+using Ploeh.AutoFixture.NUnit3;
 using Selkie.EasyNetQ;
+using Selkie.NUnit.Extensions;
 using Selkie.Services.Racetracks.Common.Messages;
 using Selkie.Services.Racetracks.Interfaces;
 using Selkie.Services.Racetracks.TypedFactories;
 using Selkie.Windsor;
-using Selkie.XUnit.Extensions;
-using Xunit;
-using Xunit.Extensions;
 
 namespace Selkie.Services.Racetracks.Tests
 {
     [ExcludeFromCodeCoverage]
-    public sealed class CostMatrixSourceManagerTests
+    [TestFixture]
+    internal sealed class CostMatrixSourceManagerTests
     {
         private const double Tolerance = 0.00001;
 
@@ -122,8 +122,8 @@ namespace Selkie.Services.Racetracks.Tests
         public void SourceDefault([NotNull] [Frozen] ISelkieBus bus,
                                   [NotNull] CostMatrixSourceManager sut)
         {
-            Assert.Equal(CostMatrix.Unkown,
-                         sut.Source);
+            Assert.AreEqual(CostMatrix.Unkown,
+                            sut.Source);
         }
 
         [Theory]
@@ -255,8 +255,8 @@ namespace Selkie.Services.Racetracks.Tests
             manager.UpdateSource();
 
             // assert
-            Assert.Equal(costMatrix,
-                         manager.Source);
+            Assert.AreEqual(costMatrix,
+                            manager.Source);
         }
 
         [NotNull]
