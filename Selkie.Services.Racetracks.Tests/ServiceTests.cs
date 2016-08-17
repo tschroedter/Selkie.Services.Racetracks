@@ -7,6 +7,7 @@ using Ploeh.AutoFixture.NUnit3;
 using Selkie.EasyNetQ;
 using Selkie.NUnit.Extensions;
 using Selkie.Services.Common.Messages;
+using Selkie.Windsor;
 
 namespace Selkie.Services.Racetracks.Tests
 {
@@ -14,6 +15,21 @@ namespace Selkie.Services.Racetracks.Tests
     [TestFixture]
     internal sealed class ServiceTests
     {
+        [Theory]
+        [AutoNSubstituteData]
+        public void Constructor_ReturnsInstance_WhenCalled([NotNull] [Frozen] ISelkieBus bus,
+                                                           [NotNull] Service service)
+        {
+            // assemble
+            // act
+            var sut = new Service(Substitute.For <ISelkieBus>(),
+                                  Substitute.For <ISelkieLogger>(),
+                                  Substitute.For <ISelkieManagementClient>());
+
+            // assert
+            Assert.NotNull(sut);
+        }
+
         [Theory]
         [AutoNSubstituteData]
         public void ServiceInitializeSubscribesToPingRequestMessageTest([NotNull] [Frozen] ISelkieBus bus,
