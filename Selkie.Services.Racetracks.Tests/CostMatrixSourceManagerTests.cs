@@ -36,7 +36,7 @@ namespace Selkie.Services.Racetracks.Tests
 
         [Theory]
         [AutoNSubstituteData]
-        public void CostMatrixGetHandlerSendMessage(
+        public void CostMatrixRequestHandlerSendMessage(
             [NotNull] ISelkieBus bus,
             [NotNull] ISelkieLogger logger,
             [NotNull] IRacetracksToDtoConverter converter,
@@ -55,11 +55,51 @@ namespace Selkie.Services.Racetracks.Tests
 
             bus.ClearReceivedCalls();
 
+            var message = new CostMatrixRequestMessage
+                          {
+                              ColonyId = costMatrix.ColonyId
+                          };
+
             // act
-            sut.CostMatrixGetHandler(new CostMatrixRequestMessage());
+            sut.CostMatrixRequestHandler(message);
 
             // assert
-            bus.Received().PublishAsync(Arg.Is <CostMatrixResponseMessage>(x => x.Matrix == costMatrix.Matrix));
+            bus.Received().PublishAsync(Arg.Is <CostMatrixResponseMessage>(x => x.ColonyId == costMatrix.ColonyId &&
+                                                                                x.Matrix == costMatrix.Matrix));
+        }
+
+        [Theory]
+        [AutoNSubstituteData]
+        public void CostMatrixRequestHandlerThrowsExceptionForNotMatchingColonyIds(
+            [NotNull] ISelkieBus bus,
+            [NotNull] ISelkieLogger logger,
+            [NotNull] IRacetracksToDtoConverter converter,
+            [NotNull] ISurveyFeaturesSourceManager surveyFeaturesSourceManager,
+            [NotNull] IRacetrackSettingsSourceManager racetrackSettingsSourceManager,
+            [NotNull] IRacetracksSourceManager racetracksSourceManager,
+            [NotNull] ICostMatrix costMatrix)
+        {
+            // assemble
+            CostMatrixSourceManager sut = ConfigureManagerWithtMatrix(bus,
+                                                                      logger,
+                                                                      surveyFeaturesSourceManager,
+                                                                      racetrackSettingsSourceManager,
+                                                                      racetracksSourceManager,
+                                                                      costMatrix);
+
+            bus.ClearReceivedCalls();
+
+            var message = new CostMatrixRequestMessage
+                          {
+                              ColonyId = Guid.Empty
+                          };
+
+            // act
+            // assert
+            Assert.Throws <ArgumentException>(() =>
+                                              {
+                                                  sut.CostMatrixRequestHandler(message);
+                                              });
         }
 
         [Theory]
@@ -108,7 +148,8 @@ namespace Selkie.Services.Racetracks.Tests
 
             // assert
             manager.Received()
-                   .SetSettings(Arg.Is <RacetrackSettings>(x => x.IsPortTurnAllowed == message.IsPortTurnAllowed &&
+                   .SetSettings(Arg.Is <RacetrackSettings>(x => x.ColonyId == message.ColonyId &&
+                                                                x.IsPortTurnAllowed == message.IsPortTurnAllowed &&
                                                                 x.IsStarboardTurnAllowed ==
                                                                 message.IsStarboardTurnAllowed &&
                                                                 Math.Abs(x.TurnRadiusForPort - message.TurnRadiusForPort) <
@@ -226,7 +267,8 @@ namespace Selkie.Services.Racetracks.Tests
             sut.UpdateSource();
 
             // assert
-            bus.Received().PublishAsync(Arg.Is <CostMatrixResponseMessage>(x => x.Matrix == costMatrix.Matrix));
+            bus.Received().PublishAsync(Arg.Is <CostMatrixResponseMessage>(x => x.ColonyId == costMatrix.ColonyId &&
+                                                                                x.Matrix == costMatrix.Matrix));
         }
 
         [Theory]

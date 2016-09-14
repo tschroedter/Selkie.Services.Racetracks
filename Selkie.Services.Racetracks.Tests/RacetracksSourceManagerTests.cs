@@ -106,7 +106,8 @@ namespace Selkie.Services.Racetracks.Tests
         {
             m_Manager.CalculateRacetracks();
 
-            m_Bus.Received().PublishAsync(Arg.Any <RacetracksResponseMessage>());
+            m_Bus.Received().PublishAsync(Arg.Is <RacetracksResponseMessage>(x => x.ColonyId == m_Manager.ColonyId &&
+                                                                                  x.Racetracks == m_RacetracksDto));
         }
 
         [Test]
@@ -218,6 +219,21 @@ namespace Selkie.Services.Racetracks.Tests
         }
 
         [Test]
+        public void RacetracksGetHandlerThrowsExceptionForColonyIdsNotMatchingTest()
+        {
+            // assemble
+            RacetracksSourceManager sut = CreateSut();
+            var message = new RacetracksGetMessage
+                          {
+                              ColonyId = Guid.Parse("00000000-0000-0000-0000-000000000001")
+                          };
+
+            // act
+            // assert
+            Assert.Throws <ArgumentException>(() => sut.RacetracksGetHandler(message));
+        }
+
+        [Test]
         public void SendRacetracksResponseMessage_SendsMessage_WhenCalled()
         {
             // assemble
@@ -227,7 +243,8 @@ namespace Selkie.Services.Racetracks.Tests
             sut.SendRacetracksResponseMessage(Substitute.For <IRacetracks>());
 
             // assert
-            m_Bus.Received().PublishAsync(Arg.Is <RacetracksResponseMessage>(x => x.Racetracks == m_RacetracksDto));
+            m_Bus.Received().PublishAsync(Arg.Is <RacetracksResponseMessage>(x => x.ColonyId == sut.ColonyId &&
+                                                                                  x.Racetracks == m_RacetracksDto));
         }
     }
 }

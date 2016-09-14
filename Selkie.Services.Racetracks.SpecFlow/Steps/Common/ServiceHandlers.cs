@@ -7,12 +7,12 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
 {
     public partial class ServiceHandlers
     {
-        private readonly ISelkieBus m_Bus;
-
         public ServiceHandlers()
         {
             m_Bus = ( ISelkieBus ) ScenarioContext.Current [ "ISelkieBus" ];
         }
+
+        private readonly ISelkieBus m_Bus;
 
         public void Subscribe()
         {
@@ -28,12 +28,9 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
             SubscribeOther();
         }
 
-        private void ServiceStoppedResponseHandler([NotNull] ServiceStoppedResponseMessage message)
+        private void PingResponseHandler([NotNull] PingResponseMessage message)
         {
-            if ( message.ServiceName == Helper.ServiceName )
-            {
-                ScenarioContext.Current [ "IsReceivedServiceStoppedResponse" ] = true;
-            }
+            ScenarioContext.Current [ "IsReceivedPingResponse" ] = true;
         }
 
         private void ServiceStartedResponseHandler([NotNull] ServiceStartedResponseMessage message)
@@ -44,9 +41,12 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
             }
         }
 
-        private void PingResponseHandler([NotNull] PingResponseMessage message)
+        private void ServiceStoppedResponseHandler([NotNull] ServiceStoppedResponseMessage message)
         {
-            ScenarioContext.Current [ "IsReceivedPingResponse" ] = true;
+            if ( message.ServiceName == Helper.ServiceName )
+            {
+                ScenarioContext.Current [ "IsReceivedServiceStoppedResponse" ] = true;
+            }
         }
     }
 }

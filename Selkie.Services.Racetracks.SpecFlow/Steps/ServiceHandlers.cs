@@ -9,13 +9,11 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
 {
     public partial class ServiceHandlers
     {
-        private void SubscribeOther()
+        private static bool IsRacetracksValid(RacetracksResponseMessage message)
         {
-            m_Bus.SubscribeAsync <CostMatrixResponseMessage>(GetType().FullName,
-                                                             CostMatrixResponseHandler);
-
-            m_Bus.SubscribeAsync <RacetracksResponseMessage>(GetType().FullName,
-                                                             RacetracksResponseHandler);
+            // todo currently just a rough test of the racetrack content, maybe better to check more details
+            return message.Racetracks.ForwardToForward.Length != 2 ||
+                   message.Racetracks.ForwardToForward [ 0 ].Length != 2;
         }
 
         private void CostMatrixResponseHandler([NotNull] CostMatrixResponseMessage message)
@@ -36,11 +34,13 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
             ScenarioContext.Current [ "ReceivedRacetracks" ] = message.Racetracks;
         }
 
-        private static bool IsRacetracksValid(RacetracksResponseMessage message)
+        private void SubscribeOther()
         {
-            // todo currently just a rough test of the racetrack content, maybe better to check more details
-            return message.Racetracks.ForwardToForward.Length != 2 ||
-                   message.Racetracks.ForwardToForward [ 0 ].Length != 2;
+            m_Bus.SubscribeAsync <CostMatrixResponseMessage>(GetType().FullName,
+                                                             CostMatrixResponseHandler);
+
+            m_Bus.SubscribeAsync <RacetracksResponseMessage>(GetType().FullName,
+                                                             RacetracksResponseHandler);
         }
     }
 }

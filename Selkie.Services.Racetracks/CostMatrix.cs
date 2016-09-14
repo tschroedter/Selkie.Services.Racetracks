@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Castle.Core;
@@ -71,6 +72,8 @@ namespace Selkie.Services.Racetracks
             }
         }
 
+        public Guid ColonyId { get; private set; } // todo were to get it from
+
         public void Initialize()
         {
             // todo move into calculate method
@@ -82,6 +85,7 @@ namespace Selkie.Services.Racetracks
             m_Matrix = CreateMatrix(m_Features);
 
             m_Racetracks = m_RacetracksSourceManager.Racetracks;
+            ColonyId = m_RacetracksSourceManager.ColonyId; // todo testing
         }
 
         public override string ToString()

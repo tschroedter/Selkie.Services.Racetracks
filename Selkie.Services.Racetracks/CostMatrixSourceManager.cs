@@ -1,4 +1,5 @@
-﻿using Castle.Core;
+﻿using System;
+using Castle.Core;
 using JetBrains.Annotations;
 using Selkie.Aop.Aspects;
 using Selkie.EasyNetQ;
@@ -36,7 +37,7 @@ namespace Selkie.Services.Racetracks
                                                               CostMatrixCalculateHandler);
 
             m_Bus.SubscribeAsync <CostMatrixRequestMessage>(subscriptionId,
-                                                            CostMatrixGetHandler);
+                                                            CostMatrixRequestHandler);
         }
 
         private readonly ISelkieBus m_Bus;
@@ -76,7 +77,7 @@ namespace Selkie.Services.Racetracks
             UpdateSource();
         }
 
-        internal void CostMatrixGetHandler([NotNull] CostMatrixRequestMessage message)
+        internal void CostMatrixRequestHandler([NotNull] CostMatrixRequestMessage message)
         {
             ICostMatrix costMatrix;
 
@@ -85,8 +86,14 @@ namespace Selkie.Services.Racetracks
                 costMatrix = m_Source;
             }
 
+            if ( message.ColonyId != costMatrix.ColonyId )
+            {
+                throw new ArgumentException("There is no CostMatrix for ColonyId '{0}'!".Inject(message.ColonyId));
+            }
+
             var response = new CostMatrixResponseMessage
                            {
+                               ColonyId = costMatrix.ColonyId,
                                Matrix = costMatrix.Matrix
                            };
 
@@ -99,6 +106,7 @@ namespace Selkie.Services.Racetracks
 
             var settings = new RacetrackSettings
                            {
+                               ColonyId = message.ColonyId,
                                IsPortTurnAllowed = message.IsPortTurnAllowed,
                                IsStarboardTurnAllowed = message.IsStarboardTurnAllowed,
                                TurnRadiusForPort = message.TurnRadiusForPort,
@@ -132,6 +140,7 @@ namespace Selkie.Services.Racetracks
         {
             m_Bus.PublishAsync(new CostMatrixResponseMessage
                                {
+                                   ColonyId = costMatrix.ColonyId,
                                    Matrix = costMatrix.Matrix
                                });
         }

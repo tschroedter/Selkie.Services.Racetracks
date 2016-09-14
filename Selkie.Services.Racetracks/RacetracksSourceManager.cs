@@ -35,7 +35,7 @@ namespace Selkie.Services.Racetracks
             m_RacetrackSettingsSourceManager = racetrackSettingsSourceManager;
             m_Factory = factory;
             m_Converter = converter;
-            m_RacetracksCalculator = m_Factory.Create<IRacetracksCalculator>();
+            m_RacetracksCalculator = m_Factory.Create <IRacetracksCalculator>();
 
             string subscriptionId = GetType().FullName;
 
@@ -71,11 +71,14 @@ namespace Selkie.Services.Racetracks
             SendRacetracksResponseMessage(Racetracks);
         }
 
+        public Guid ColonyId { get; private set; }
+
         internal void Calculate()
         {
             m_Factory.Release(m_RacetracksCalculator);
 
             IRacetrackSettingsSource source = m_RacetrackSettingsSourceManager.Source;
+            ColonyId = source.ColonyId; // todo testing
 
             LogRacetrackSettings(source);
 
@@ -90,6 +93,14 @@ namespace Selkie.Services.Racetracks
 
         internal void RacetracksGetHandler(RacetracksGetMessage message)
         {
+            if ( message.ColonyId != ColonyId )
+            {
+                string text = "There are no racetracks for ColonyId '{0}'!".Inject(message.ColonyId);
+
+                throw new ArgumentException(text,
+                                            "message");
+            }
+
             SendRacetracksResponseMessage(Racetracks);
         }
 
@@ -99,6 +110,7 @@ namespace Selkie.Services.Racetracks
 
             var response = new RacetracksResponseMessage
                            {
+                               ColonyId = ColonyId,
                                Racetracks = racetracksDto
                            };
 
@@ -108,11 +120,13 @@ namespace Selkie.Services.Racetracks
         private void LogRacetrackSettings([NotNull] IRacetrackSettingsSource source)
         {
             const string text = "[RacetracksSourceManager] " +
-                                "Racetrack Settings: TurnRadius = {0} " +
-                                "IsPortTurnAllowed = {1} " +
-                                "IsStarboardTurnAllowed = {2}";
+                                "ColonyId: {0} " +
+                                "Racetrack Settings: TurnRadius = {1} " +
+                                "IsPortTurnAllowed = {2} " +
+                                "IsStarboardTurnAllowed = {3}";
 
-            m_Logger.Info(text.Inject(source.TurnRadiusForPort,
+            m_Logger.Info(text.Inject(source.ColonyId,
+                                      source.TurnRadiusForPort,
                                       source.TurnRadiusForStarboard,
                                       source.IsPortTurnAllowed,
                                       source.IsStarboardTurnAllowed));

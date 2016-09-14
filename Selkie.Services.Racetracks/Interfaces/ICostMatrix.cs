@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Selkie.Geometry.Surveying;
@@ -14,5 +15,7 @@ namespace Selkie.Services.Racetracks.Interfaces
         double[][] Matrix { get; }
 
         IRacetracks Racetracks { get; }
+
+        Guid ColonyId { get; }
     }
 }

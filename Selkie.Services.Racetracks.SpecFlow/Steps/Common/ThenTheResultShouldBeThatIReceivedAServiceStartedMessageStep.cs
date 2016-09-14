@@ -8,7 +8,7 @@ namespace Selkie.Services.Racetracks.SpecFlow.Steps.Common
         [Then(@"the result should be that I received a ServiceStartedMessage")]
         public override void Do()
         {
-            SleepWaitAndDo(() => GetBoolValueForScenarioContext("IsReceivedServiceStartedResponse" ),
+            SleepWaitAndDo(() => GetBoolValueForScenarioContext("IsReceivedServiceStartedResponse"),
                            DoNothing);
 
             Assert.True(GetBoolValueForScenarioContext("IsReceivedServiceStartedResponse"),

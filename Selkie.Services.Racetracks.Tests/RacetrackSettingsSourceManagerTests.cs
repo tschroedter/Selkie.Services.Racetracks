@@ -27,6 +27,7 @@ namespace Selkie.Services.Racetracks.Tests
         {
             var settings = new RacetrackSettings
                            {
+                               ColonyId = Guid.NewGuid(),
                                TurnRadiusForPort = 100.0,
                                TurnRadiusForStarboard = 200.0,
                                IsPortTurnAllowed = true,
@@ -39,6 +40,21 @@ namespace Selkie.Services.Racetracks.Tests
 
             NUnitHelper.AssertIsEquivalent(100.0,
                                            actual.TurnRadiusForPort);
+        }
+
+        [Test]
+        public void SetSettings_ThrowsException_ForColonyIdIsEmpty()
+        {
+            var settings = new RacetrackSettings
+                           {
+                               ColonyId = Guid.Empty,
+                               TurnRadiusForPort = 100.0,
+                               TurnRadiusForStarboard = 200.0,
+                               IsPortTurnAllowed = true,
+                               IsStarboardTurnAllowed = true
+                           };
+
+            Assert.Throws <ArgumentException>(() => m_Manager.SetSettings(settings));
         }
 
         [Test]

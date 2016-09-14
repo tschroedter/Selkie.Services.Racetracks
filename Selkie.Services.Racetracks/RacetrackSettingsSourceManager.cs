@@ -50,6 +50,14 @@ namespace Selkie.Services.Racetracks
 
         private static void ValidateSettings(RacetrackSettings settings)
         {
+            if ( settings.ColonyId == Guid.Empty )
+            {
+                string text = "ColonyId '{0}' can't be Guid.Empty!".Inject(settings.ColonyId);
+
+                throw new ArgumentException(text,
+                                            "settings");
+            }
+
             if ( settings.TurnRadiusForPort <= 0.0 )
             {
                 string text = "Turn radius for port turn in meters is '{0}' " +
@@ -73,7 +81,8 @@ namespace Selkie.Services.Racetracks
 
         private void HandleValidRacetrackSettingsMessage([NotNull] RacetrackSettings settings)
         {
-            m_Source = new RacetrackSettingsSource(settings.TurnRadiusForPort,
+            m_Source = new RacetrackSettingsSource(settings.ColonyId,
+                                                   settings.TurnRadiusForPort,
                                                    settings.TurnRadiusForStarboard,
                                                    settings.IsPortTurnAllowed,
                                                    settings.IsStarboardTurnAllowed);
@@ -84,12 +93,14 @@ namespace Selkie.Services.Racetracks
         private void LogRacetrackSettings([NotNull] IRacetrackSettingsSource source)
         {
             const string text = "[RacetrackSettingsSourceManager] " +
-                                "Racetrack Settings: TurnRadiusForPort = {0} " +
-                                "TurnRadiusForStarboard = {1} " +
-                                "IsPortTurnAllowed = {2} " +
-                                "IsStarboardTurnAllowed = {3}";
+                                "ColonyId: {0}" +
+                                "Racetrack Settings: TurnRadiusForPort = {1} " +
+                                "TurnRadiusForStarboard = {2} " +
+                                "IsPortTurnAllowed = {3} " +
+                                "IsStarboardTurnAllowed = {4}";
 
-            m_Logger.Info(text.Inject(source.TurnRadiusForPort,
+            m_Logger.Info(text.Inject(source.ColonyId,
+                                      source.TurnRadiusForPort,
                                       source.TurnRadiusForStarboard,
                                       source.IsPortTurnAllowed,
                                       source.IsStarboardTurnAllowed));
